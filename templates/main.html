@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block main %}
+  <div class="vh-100 d-flex align-items-center justify-content-around">
+    <div class="col-3 card" style="">
+      <a href="{% url 'time-analysis' %}">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/7/77/Random-data-plus-trend-r2.png" class="card-img-top" alt="Часовий аналіз">
+        <div class="card-body">
+          <p class="h1 text-center card-text">
+            Часовий аналіз
+          </p>
+        </div>
+      </a>
+    </div>
+  </div>
+{% endblock main %}

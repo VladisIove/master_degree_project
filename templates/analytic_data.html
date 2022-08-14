@@ -1,0 +1,84 @@
+<ul class="nav nav-tabs" id="myTab" role="tablist">
+
+  
+  <li class="nav-item">
+    <a class="nav-link active" id="graph_time-tab" data-toggle="tab" href="#graph_time" role="tab" aria-controls="graph_time" aria-selected="true">
+      {% if  data.calculated_data %} 
+      Графік часового аналізу
+      {% else %} 
+      Опис сторінки  
+      {% endif %}
+    </a>
+  </li>
+  {% if data.calculated_data %}
+  <li class="nav-item">
+    <a class="nav-link" id="analysis-tab" data-toggle="tab" href="#analysis" role="tab" aria-controls="analysis" aria-selected="false">Аналіз вхідних даних</a>
+  </li>
+  {% endif %}
+
+</ul>
+<div class="border tab-content" id="myTabContent">
+  <div class="tab-pane fade show active p-5" id="graph_time" role="tabpanel" aria-labelledby="graph_time-tab">
+    <canvas id="graph"></canvas>
+  </div>
+  <div class="tab-pane fade" id="analysis" role="tabpanel" aria-labelledby="analysis-tab">
+    <table class="table">
+      <thead>
+        <tr>
+
+          <th scope="col">#</th>
+          {% for column_name in data.headers %}
+            <th scope="col">{{column_name}}</th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for key, values in data.calculated_data.items %}
+        <tr>
+          <th scope="row">{{values.label}}</th>
+          {% for k, v in values.value.items %}
+          <td>{{v}}</td>
+          {% endfor %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+<script>
+  const data_for_graph = JSON.parse(`{{data.data_for_graph|safe}}`.replace(/'/g, '"'));
+  const keys = Object.keys(data_for_graph)
+
+  const data = {
+    labels: data_for_graph[keys[0]],
+    datasets: [{
+      label: 'Вхідний графік',
+      backgroundColor: 'rgb(255, 99, 132)',
+      borderColor: 'rgb(255, 99, 132)',
+      data: data_for_graph[keys[1]],
+    },
+    {
+      label: 'Амплітудна модуляція',
+      backgroundColor: 'rgb(125, 222, 241)',
+      borderColor: 'rgb(125, 222, 241)',
+      data: data_for_graph[keys[2]],
+    }]
+  };
+  
+  
+  const config = {
+    type: 'line',
+    data: data,
+    options: {
+      parsing: {
+        xAxisKey: keys[0],
+        yAxisKey: keys[1]
+      }
+    }
+  };
+
+  const myChart = new Chart(
+    document.getElementById('graph'),
+    config
+  );
+</script>

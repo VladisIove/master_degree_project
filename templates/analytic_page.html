@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+
+{% block main %}
+    <div class="vh-100 d-flex justify-content-around my-3">
+        <div class="row m-0 p-0 col-md-3 col-12">
+            <div class="border p-5 col-12"> 
+                {% block form %}
+                    <form method="post" enctype="multipart/form-data" action={% url 'time-analysis' %}>
+                        {% include 'analytic_fields.html' with form=form button_name='Обробити дані' %}
+                    </form>
+                {% endblock form %}
+            </div>
+    
+            <div class="border p-5 col-12 my-3">
+                {% block export_form %}
+
+                <form method="post" action={% url 'time-analysis' %}?export=true>
+                    {% include 'analytic_fields.html' with form=export_file_form button_name='Завантажити дані' %}
+                </form>
+        
+                {% endblock export_form %}
+            </div>
+        </div>
+
+        <div class="col-md-8 col-12 m-0 p-0"> 
+            {% block analytics %}
+                {% include "analytic_data.html" with data=data %}
+            {% endblock analytics %}
+        </div>
+    </div>
+{% endblock main %}
+
+{% block script %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+{% endblock script%}
