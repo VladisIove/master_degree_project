@@ -1,24 +1,31 @@
 <ul class="nav nav-tabs" id="myTab" role="tablist">
-
-  
   <li class="nav-item">
-    <a class="nav-link active" id="graph_time-tab" data-toggle="tab" href="#graph_time" role="tab" aria-controls="graph_time" aria-selected="true">
-      {% if  data.calculated_data %} 
+    <a class="nav-link active" id="info-tab" data-toggle="tab" href="#info" role="tab" aria-controls="info" aria-selected="true">
       Графік часового аналізу
-      {% else %} 
-      Опис сторінки  
-      {% endif %}
     </a>
   </li>
   {% if data.calculated_data %}
   <li class="nav-item">
+    <a class="nav-link " id="graph_time-tab" data-toggle="tab" href="#graph_time" role="tab" aria-controls="graph_time" aria-selected="false">
+      Графік часового аналізу
+    </a>
+</li>
+  <li class="nav-item">
     <a class="nav-link" id="analysis-tab" data-toggle="tab" href="#analysis" role="tab" aria-controls="analysis" aria-selected="false">Аналіз вхідних даних</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="frequency-analysis-tab" data-toggle="tab" href="#frequency-analysis" role="tab" aria-controls="frequency-analysis" aria-selected="false">Частотний аналіз</a>
   </li>
   {% endif %}
 
 </ul>
 <div class="border tab-content" id="myTabContent">
-  <div class="tab-pane fade show active p-5" id="graph_time" role="tabpanel" aria-labelledby="graph_time-tab">
+  <div class="tab-pane active  p-5" id="info" role="tabpanel" aria-labelledby="info-tab">
+    Аналіз часових рядів — сукупність математико-статистичних методів аналізу, 
+    призначених для виявлення структури часових рядів і для їх прогнозування. Сюди належать, зокрема, методи регресійного аналізу.
+  </div>
+
+  <div class="tab-pane fade  p-5" id="graph_time" role="tabpanel" aria-labelledby="graph_time-tab">
     <canvas id="graph"></canvas>
   </div>
   <div class="tab-pane fade" id="analysis" role="tabpanel" aria-labelledby="analysis-tab">
@@ -33,7 +40,7 @@
         </tr>
       </thead>
       <tbody>
-        {% for key, values in data.calculated_data.items %}
+        {% for key, values in data.calculated_data.analytics_data.items %}
         <tr>
           <th scope="row">{{values.label}}</th>
           {% for k, v in values.value.items %}
@@ -43,6 +50,17 @@
         {% endfor %}
       </tbody>
     </table>
+  </div>
+
+  <div class="tab-pane fade  p-5" id="frequency-analysis" role="tabpanel" aria-labelledby="frequency-analysis-tab">
+
+    <canvas id="fft-graph"></canvas>
+
+    <canvas id="periodogram-graph"></canvas>
+
+    <canvas id="triangle-periodogram-graph"></canvas>
+
+    <canvas id="hann-periodogram-graph"></canvas>
   </div>
 </div>
 <script>
@@ -81,4 +99,208 @@
     document.getElementById('graph'),
     config
   );
+
+
+  /// fft graph
+
+  var VerticalLinePlugin = {
+    afterDatasetDraw: function (chart, params) {
+        // Only draw after animation has finished and is the desired dataset
+        if(params.meta.type == "scatter") {
+            var ctx = chart.ctx;
+            ctx.save();
+            params.meta.data.forEach(point => {
+                ctx.strokeStyle = point.options.borderColor;
+                ctx.lineWidth = point.options.borderWidth;
+                ctx.beginPath();
+                ctx.moveTo(point.x, point.y);
+                ctx.lineTo(point.x, chart.chartArea.bottom);
+                ctx.stroke();
+            });
+            ctx.restore();
+        }
+    }
+};
+
+  const data_for_fft_graph = JSON.parse(`{{data.calculated_data.graphs_data.fft|safe}}`.replace(/'/g, '"'));
+  const fft_keys = Object.keys(data_for_fft_graph)
+  const fft_data = {
+    labels: 'Fooo',
+    datasets: [
+      {
+        data: data_for_fft_graph,
+        pointRadius: 4,
+        borderWidth: 1,
+        borderColor: "rgba(255, 0, 0, 1)",
+        backgroundColor: "rgba(0, 0, 0, 0.8)",
+        type: "scatter",
+    }
+    ]
+  };
+  
+  
+  const fft_config = {
+    type: 'line',
+    data: fft_data,
+    options: {
+      animation: {
+          duration: 0,
+      },
+      responsive: true,
+      legend: {
+        display: false,
+      },
+      tooltips: {
+          enabled: false,
+      },
+  },
+  plugins: [ VerticalLinePlugin ],
+  };
+
+  const fft_graph = new Chart(
+    document.getElementById('fft-graph'),
+    fft_config
+  );
+
+  const data_for_periodogram_graph = JSON.parse(`{{data.calculated_data.graphs_data.periodogram|safe}}`.replace(/'/g, '"'));
+  const periodogram_keys = Object.keys(data_for_periodogram_graph)
+  
+  const periodogram_data = {
+    labels: data_for_periodogram_graph[periodogram_keys[0]],
+    datasets: [{
+      label: 'періодограма',
+      backgroundColor: 'rgb(255, 99, 132)',
+      borderColor: 'rgb(255, 99, 132)',
+      data: data_for_periodogram_graph[periodogram_keys[1]],
+    }]
+  };
+  
+  
+  const periodogram_config = {
+    type: 'line',
+    data: periodogram_data,
+    options: {
+      parsing: {
+        xAxisKey: periodogram_keys[0],
+        yAxisKey: periodogram_keys[1]
+      },
+      responsive: true,
+      plugins: {
+        title: {
+          display: true,
+          text: 'Chart.js Line Chart - Logarithmic'
+        }
+      },
+      scales: {
+        x: {
+          display: true,
+        },
+        y: {
+          display: true,
+          type: 'logarithmic',
+        }
+      }
+    }
+  };
+
+  const periodogram = new Chart(
+    document.getElementById('periodogram-graph'),
+    periodogram_config
+  );
+
+
+  const data_for_triangle_periodogram_graph = JSON.parse(`{{data.calculated_data.graphs_data.triangle_periodogram|safe}}`.replace(/'/g, '"'));
+  const triangle_periodogram_keys = Object.keys(data_for_triangle_periodogram_graph)
+  
+  const triangle_periodogram_data = {
+    labels: data_for_triangle_periodogram_graph[triangle_periodogram_keys[0]],
+    datasets: [{
+      label: 'TRIANGLE періодограма',
+      backgroundColor: 'rgb(255, 99, 132)',
+      borderColor: 'rgb(255, 99, 132)',
+      data: data_for_triangle_periodogram_graph[triangle_periodogram_keys[1]],
+    }]
+  };
+  
+  
+  const triangle_periodogram_config = {
+    type: 'line',
+    data: triangle_periodogram_data,
+    options: {
+      parsing: {
+        xAxisKey: triangle_periodogram_keys[0],
+        yAxisKey: triangle_periodogram_keys[1]
+      },
+      responsive: true,
+      plugins: {
+        title: {
+          display: true,
+          text: 'Chart.js Line Chart - Logarithmic'
+        }
+      },
+      scales: {
+        x: {
+          display: true,
+        },
+        y: {
+          display: true,
+          type: 'logarithmic',
+        }
+      }
+    }
+  };
+
+  const triangle_periodogram = new Chart(
+    document.getElementById('triangle-periodogram-graph'),
+    triangle_periodogram_config
+  );
+
+  
+
+  const data_for_hann_periodogram_graph = JSON.parse(`{{data.calculated_data.graphs_data.hann_periodogram|safe}}`.replace(/'/g, '"'));
+  const hann_periodogram_keys = Object.keys(data_for_hann_periodogram_graph)
+  
+  const hann_periodogram_data = {
+    labels: data_for_hann_periodogram_graph[hann_periodogram_keys[0]],
+    datasets: [{
+      label: 'HANN періодограма',
+      backgroundColor: 'rgb(255, 99, 132)',
+      borderColor: 'rgb(255, 99, 132)',
+      data: data_for_hann_periodogram_graph[hann_periodogram_keys[1]],
+    }]
+  };
+  
+  
+  const hann_periodogram_config = {
+    type: 'line',
+    data: hann_periodogram_data,
+    options: {
+      parsing: {
+        xAxisKey: hann_periodogram_keys[0],
+        yAxisKey: hann_periodogram_keys[1]
+      },
+      responsive: true,
+      plugins: {
+        title: {
+          display: true,
+          text: 'Chart.js Line Chart - Logarithmic'
+        }
+      },
+      scales: {
+        x: {
+          display: true,
+        },
+        y: {
+          display: true,
+          type: 'logarithmic',
+        }
+      }
+    }
+  };
+
+  const hann_periodogram = new Chart(
+    document.getElementById('hann-periodogram-graph'),
+    hann_periodogram_config
+  );
+
 </script>

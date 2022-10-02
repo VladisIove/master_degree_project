@@ -1,16 +1,63 @@
 {% extends "base.html" %}
 
+
+{% block script %}
+<script type="text/javascript">
+      $(window).on('load', function() {
+        if (sessionStorage.getItem("loaded") === null) {
+          sessionStorage.setItem("loaded", "loaded");
+          $('#infoModal').modal('show');
+       }
+      });
+   
+</script>
+
+{% endblock %}
+
+
 {% block main %}
-  <div class="vh-100 d-flex align-items-center justify-content-around">
-    <div class="col-3 card" style="">
-      <a href="{% url 'time-analysis' %}">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/7/77/Random-data-plus-trend-r2.png" class="card-img-top" alt="Часовий аналіз">
+
+<div class="modal show" id="infoModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-body">
+        <div class="container-fluid">
+          <div class="row">
+            <button type="button" class="close offset-11 col-1" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+            <p class="text-justify">
+              Інформаційне модальне вікно, яке буде заповнено після сформування кінцевого 
+              результата програми. Наразі цей текст написаний для того щоб, людина
+              яка подивиться цей сайт зрозуміла нащо я потрібен. Бо всі думають, що 
+              мене потрібно видалити!
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <div class="d-flex justify-content-center">
+    <div class="col-12 d-flex justify-content-center flex-column text-center">
+        <p class="h1 text-center">Автоматизована система обробки сигналів</p>
+        <p class="text-justify text-center">Шановний користувач, Ви знаходитеся на початковому екрані Автоматизованої системи</p>
+    </div>
+  </div>
+
+  <div class="d-flex align-items-center justify-content-around">
+    <div class="col-3 card" style="width: 13rem;">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/7/77/Random-data-plus-trend-r2.png" class="card-img-top" style="width:auto;" alt="Часовий аналіз">
         <div class="card-body">
-          <p class="h1 text-center card-text">
+          <p class="h4 text-center card-text">
             Часовий аналіз
           </p>
+          <p class="card-text">
+            Сторінка по обробці детерміновах та стохастичних сигналів. 
+          </p>
+          <a href="{% url 'time-analysis' %}" class="btn btn-primary stretched-link">Перейти</a>
         </div>
-      </a>
     </div>
   </div>
 {% endblock main %}
