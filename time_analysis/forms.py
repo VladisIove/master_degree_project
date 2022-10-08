@@ -1,5 +1,5 @@
-from cmath import inf
-from email.policy import default
+
+import math
 import numpy as np
 
 from pandas import DataFrame
@@ -27,7 +27,7 @@ class TimeAnalyticForm(AnalyticBaseForm):
             self.SignalType.DETERMINATION: self._determination_data,
             self.SignalType.STOCHASTIC: self._stochastic_data
         }
-        analytics_data = signal_type_calculation[self.cleaned_data['signal_type']](df)
+        analytics_data = signal_type_calculation[self.cleaned_data['signal_type']](df.copy())
         graphs_data = self._get_graphs_data(df)
         return {
             'analytics_data': analytics_data,
@@ -35,8 +35,9 @@ class TimeAnalyticForm(AnalyticBaseForm):
         }
         
     def _get_graphs_data(self, df: DataFrame) -> dict:
+        print(df)
         kilkist_vidlikiv = self._get_kilkist_vidlikiv(df)
-        # period_descritiatcii = self._get_period_descritiatcii(df)
+        period_descritiatcii = self._get_period_descritiatcii(df)
         chastota_descritiatcii = self._get_chastota_descritiatcii(df)
         
         fft_data = self._get_fft_data(df)
@@ -44,7 +45,7 @@ class TimeAnalyticForm(AnalyticBaseForm):
         triangle_periodogram_data = self._get_triangle_periodogram_data(df)
         hann_periodogram_data = self._get_hann_periodogram_data(df)
         return {
-            # 'period_descritiatcii': period_descritiatcii,
+            'period_descritiatcii': period_descritiatcii,
             'kilkist_vidlikiv': kilkist_vidlikiv,
             'chastota_descritiatcii': chastota_descritiatcii,
             
@@ -160,11 +161,15 @@ class TimeAnalyticForm(AnalyticBaseForm):
         return len(df[X_header_name].to_list())
     
     def _get_chastota_descritiatcii(self, df: DataFrame) -> float:
-        return list(fftfreq(self._get_kilkist_vidlikiv(df)))
+        return 1 / self._get_period_descritiatcii(df) 
 
-    def _get_period_descritiatcii(self, df: DataFrame) -> float:
-        freq = self._get_chastota_descritiatcii(df)
-        return [1/f if 1/f != np.inf else 0  for f in freq] 
+    @staticmethod
+    def _get_period_descritiatcii(df: DataFrame) -> float:
+        X_header_name = df.columns.tolist()[0]
+        x = df[X_header_name].to_list()
+        for index, item in enumerate(x):
+            if x[index+1] - item:  
+                return math.fabs(item)
     
     @staticmethod
     def _get_period(df: DataFrame) -> int:
@@ -176,25 +181,30 @@ class TimeAnalyticForm(AnalyticBaseForm):
         '''
         Y_header_name = df.columns.tolist()[1]
         y = df[Y_header_name].to_list()
-        yf = np.abs(fft(y))
-        xf = self._get_chastota_descritiatcii(df)
+        fd = self._get_chastota_descritiatcii(df)
+        yf = 2 * fftshift(np.abs(fft(y)/len(y)))
+        xf = np.arange(-fd/2, fd/2, fd/len(y)) 
         return DataFrame({'y': list(yf), 'x': list(xf)}).to_dict('records')
     
     def _get_periodogram_data(self, df: DataFrame) -> dict:
         Y_header_name = df.columns.tolist()[1]
         y = df[Y_header_name].to_list()
-        x, y = periodogram(y, 1)
-        return DataFrame({'y': list(y), 'x': list(x)}).to_dict('list')
+        fd = self._get_chastota_descritiatcii(df)
+        xp, yp = periodogram(y, fd)
+        return DataFrame({'y': list(yp), 'x': list(xp)}).to_dict('list')
     
     def _get_triangle_periodogram_data(self, df: DataFrame) -> dict:
         Y_header_name = df.columns.tolist()[1]
         y = df[Y_header_name].to_list()
-        x, y = periodogram(y, 1, window='triang')
+        fd =  self._get_chastota_descritiatcii(df)
+        x, y = periodogram(y, fd, window='triang')
         return DataFrame({'y': list(y), 'x': list(x)}).to_dict('list')
     
     def _get_hann_periodogram_data(self, df: DataFrame) -> dict:
         Y_header_name = df.columns.tolist()[1]
         y = df[Y_header_name].to_list()
-        x, y = periodogram(y, 1, window='hann')
+        fd =  self._get_chastota_descritiatcii(df)
+        xf = np.arange(-fd/2, fd/2, fd/len(y)) 
+        x, y = periodogram(y, fd, window='hann')
         return DataFrame({'y': list(y), 'x': list(x)}).to_dict('list')
-        
+

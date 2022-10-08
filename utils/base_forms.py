@@ -19,6 +19,7 @@ class AnalyticBaseForm(Form):
     def get_dataframe_from_file(self) -> DataFrame:
         file = self.cleaned_data['input_data_file'].file
         filename = self.cleaned_data['input_data_file'].name
+        
         return convertor_file_to_df.convert(file, filename)
     
 

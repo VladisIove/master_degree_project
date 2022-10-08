@@ -53,6 +53,9 @@
   </div>
 
   <div class="tab-pane fade  p-5" id="frequency-analysis" role="tabpanel" aria-labelledby="frequency-analysis-tab">
+    <p class="h3">Fd: {{ data.calculated_data.graphs_data.period_descritiatcii }}</p>
+    <p class="h3">Td: {{ data.calculated_data.graphs_data.chastota_descritiatcii }}</p>
+    <p class="h3">N: {{ data.calculated_data.graphs_data.kilkist_vidlikiv }}</p>
 
     <canvas id="fft-graph"></canvas>
 
@@ -164,14 +167,14 @@
 
   const data_for_periodogram_graph = JSON.parse(`{{data.calculated_data.graphs_data.periodogram|safe}}`.replace(/'/g, '"'));
   const periodogram_keys = Object.keys(data_for_periodogram_graph)
-  
+  console.log(data_for_periodogram_graph)
   const periodogram_data = {
-    labels: data_for_periodogram_graph[periodogram_keys[0]],
+    labels: data_for_periodogram_graph[periodogram_keys[1]],
     datasets: [{
       label: 'періодограма',
       backgroundColor: 'rgb(255, 99, 132)',
       borderColor: 'rgb(255, 99, 132)',
-      data: data_for_periodogram_graph[periodogram_keys[1]],
+      data: data_for_periodogram_graph[periodogram_keys[0]],
     }]
   };
   
@@ -181,14 +184,13 @@
     data: periodogram_data,
     options: {
       parsing: {
-        xAxisKey: periodogram_keys[0],
-        yAxisKey: periodogram_keys[1]
+        xAxisKey: periodogram_keys[1],
+        yAxisKey: periodogram_keys[0]
       },
       responsive: true,
       plugins: {
         title: {
-          display: true,
-          text: 'Chart.js Line Chart - Logarithmic'
+          display: true
         }
       },
       scales: {
@@ -213,12 +215,12 @@
   const triangle_periodogram_keys = Object.keys(data_for_triangle_periodogram_graph)
   
   const triangle_periodogram_data = {
-    labels: data_for_triangle_periodogram_graph[triangle_periodogram_keys[0]],
+    labels: data_for_triangle_periodogram_graph[triangle_periodogram_keys[1]],
     datasets: [{
       label: 'TRIANGLE періодограма',
       backgroundColor: 'rgb(255, 99, 132)',
       borderColor: 'rgb(255, 99, 132)',
-      data: data_for_triangle_periodogram_graph[triangle_periodogram_keys[1]],
+      data: data_for_triangle_periodogram_graph[triangle_periodogram_keys[0]],
     }]
   };
   
@@ -228,8 +230,8 @@
     data: triangle_periodogram_data,
     options: {
       parsing: {
-        xAxisKey: triangle_periodogram_keys[0],
-        yAxisKey: triangle_periodogram_keys[1]
+        xAxisKey: triangle_periodogram_keys[1],
+        yAxisKey: triangle_periodogram_keys[0]
       },
       responsive: true,
       plugins: {
@@ -261,12 +263,12 @@
   const hann_periodogram_keys = Object.keys(data_for_hann_periodogram_graph)
   
   const hann_periodogram_data = {
-    labels: data_for_hann_periodogram_graph[hann_periodogram_keys[0]],
+    labels: data_for_hann_periodogram_graph[hann_periodogram_keys[1]],
     datasets: [{
       label: 'HANN періодограма',
       backgroundColor: 'rgb(255, 99, 132)',
       borderColor: 'rgb(255, 99, 132)',
-      data: data_for_hann_periodogram_graph[hann_periodogram_keys[1]],
+      data: data_for_hann_periodogram_graph[hann_periodogram_keys[0]],
     }]
   };
   
@@ -276,8 +278,8 @@
     data: hann_periodogram_data,
     options: {
       parsing: {
-        xAxisKey: hann_periodogram_keys[0],
-        yAxisKey: hann_periodogram_keys[1]
+        xAxisKey: hann_periodogram_keys[1],
+        yAxisKey: hann_periodogram_keys[0]
       },
       responsive: true,
       plugins: {
