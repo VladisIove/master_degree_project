@@ -69,7 +69,6 @@
 <script>
   const data_for_graph = JSON.parse(`{{data.data_for_graph|safe}}`.replace(/'/g, '"'));
   const keys = Object.keys(data_for_graph)
-
   const data = {
     labels: data_for_graph[keys[0]],
     datasets: [{
@@ -94,7 +93,15 @@
       parsing: {
         xAxisKey: keys[0],
         yAxisKey: keys[1]
-      }
+      },
+      scales: {
+        x: {
+          display: true,
+        },
+        y: {
+          display: true,
+        }
+    }
     }
   };
 
@@ -167,7 +174,6 @@
 
   const data_for_periodogram_graph = JSON.parse(`{{data.calculated_data.graphs_data.periodogram|safe}}`.replace(/'/g, '"'));
   const periodogram_keys = Object.keys(data_for_periodogram_graph)
-  console.log(data_for_periodogram_graph)
   const periodogram_data = {
     labels: data_for_periodogram_graph[periodogram_keys[1]],
     datasets: [{

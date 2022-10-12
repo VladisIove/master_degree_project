@@ -27,15 +27,14 @@ class TimeAnalyticForm(AnalyticBaseForm):
             self.SignalType.DETERMINATION: self._determination_data,
             self.SignalType.STOCHASTIC: self._stochastic_data
         }
-        analytics_data = signal_type_calculation[self.cleaned_data['signal_type']](df.copy())
-        graphs_data = self._get_graphs_data(df)
+        analytics_data = signal_type_calculation[self.cleaned_data['signal_type']](df)
+        graphs_data = self._get_graphs_data(df.copy())
         return {
             'analytics_data': analytics_data,
             'graphs_data': graphs_data
         }
         
     def _get_graphs_data(self, df: DataFrame) -> dict:
-        print(df)
         kilkist_vidlikiv = self._get_kilkist_vidlikiv(df)
         period_descritiatcii = self._get_period_descritiatcii(df)
         chastota_descritiatcii = self._get_chastota_descritiatcii(df)
@@ -113,10 +112,13 @@ class TimeAnalyticForm(AnalyticBaseForm):
         
     @staticmethod
     def _get_quantile(df: DataFrame) -> dict:
-        quantile = df.quantile(0.5)
+        headers = df.columns.tolist()
+        x_rozmah = df[headers[0]].max() + math.fabs(df[headers[0]].min())
+        y_rozmah = df[headers[1]].max() + math.fabs(df[headers[1]].min())
+        
         return {
             'label': 'Розмах',
-            'value': quantile.to_dict()
+            'value': {headers[0]:x_rozmah, headers[1]: y_rozmah} 
         }
         
     @staticmethod
@@ -151,9 +153,7 @@ class TimeAnalyticForm(AnalyticBaseForm):
         headers = df.columns.tolist()
         analytic_signal = np.abs(hilbert(df[headers[1]]))
         df['ampl'] = analytic_signal
-        for column_name in df.columns.tolist():
-            df[column_name] = df[column_name].round(2)
-        return df 
+        return df
     
     @staticmethod
     def _get_kilkist_vidlikiv(df: DataFrame) -> float:
@@ -183,7 +183,9 @@ class TimeAnalyticForm(AnalyticBaseForm):
         y = df[Y_header_name].to_list()
         fd = self._get_chastota_descritiatcii(df)
         yf = 2 * fftshift(np.abs(fft(y)/len(y)))
-        xf = np.arange(-fd/2, fd/2, fd/len(y)) 
+        xf = np.arange(-fd/2, fd/2-fd/len(y), fd/len(y)) 
+        if xf.shape[0] != yf.shape[0]:
+            xf = np.arange(-fd/2, fd/2, fd/len(y)) 
         return DataFrame({'y': list(yf), 'x': list(xf)}).to_dict('records')
     
     def _get_periodogram_data(self, df: DataFrame) -> dict:
