@@ -3,7 +3,7 @@ import math
 import numpy as np
 
 from pandas import DataFrame
-from scipy.fft import fft, fftfreq, fftshift
+from scipy.fft import fft, fftshift
 from scipy.signal import hilbert, periodogram
 from utils.base_forms import AnalyticBaseForm 
 
@@ -40,20 +40,32 @@ class TimeAnalyticForm(AnalyticBaseForm):
         chastota_descritiatcii = self._get_chastota_descritiatcii(df)
         
         fft_data = self._get_fft_data(df)
-        periodogram_data = self._get_periodogram_data(df)
-        triangle_periodogram_data = self._get_triangle_periodogram_data(df)
-        hann_periodogram_data = self._get_hann_periodogram_data(df)
+
         return {
             'period_descritiatcii': period_descritiatcii,
             'kilkist_vidlikiv': kilkist_vidlikiv,
             'chastota_descritiatcii': chastota_descritiatcii,
             
             'fft': fft_data,
-            'periodogram': periodogram_data,
-            'triangle_periodogram': triangle_periodogram_data,
-            'hann_periodogram': hann_periodogram_data
+            'periodogram': self._get_periodogram_data(df),
+            'triangle_periodogram': self._get_triangle_periodogram_data(df),
+            'hann_periodogram': self._get_hann_periodogram_data(df),
+            
+            'blackman_periodogram': self._get_blackman_periodogram_data(df),
+            'hamming_periodogram': self._get_hamming_periodogram_data(df),
+            'bartlett_periodogram': self._get_bartlett_periodogram_data(df),
+            'flattop_periodogram': self._get_flattop_periodogram_data(df),
+            'parzen_periodogram': self._get_parzen_periodogram_data(df),
+            'bohman_periodogram': self._get_bohman_periodogram_data(df),
+            'blackmanharris_periodogram': self._get_blackmanharris_periodogram_data(df),
+            'nuttall_periodogram': self._get_nuttall_periodogram_data(df),
+            'barthann_periodogram': self._get_barthann_periodogram_data(df),
+            'cosine_periodogram': self._get_cosine_periodogram_data(df),
+            'exponential_periodogram': self._get_exponential_periodogram_data(df),
+            'tukey_periodogram': self._get_tukey_periodogram_data(df),
+            'taylor_periodogram': self._get_taylor_periodogram_data(df)
         }
-    
+        
     def _stochastic_data(self, df: DataFrame) -> dict:
         data = {}
         data['min'] = self._get_min(df) 
@@ -182,31 +194,65 @@ class TimeAnalyticForm(AnalyticBaseForm):
         Y_header_name = df.columns.tolist()[1]
         y = df[Y_header_name].to_list()
         fd = self._get_chastota_descritiatcii(df)
-        yf = 2 * fftshift(np.abs(fft(y)/len(y)))
+        yf = fftshift(np.abs(fft(y)/len(y)))
         xf = np.arange(-fd/2, fd/2-fd/len(y), fd/len(y)) 
         if xf.shape[0] != yf.shape[0]:
             xf = np.arange(-fd/2, fd/2, fd/len(y)) 
         return DataFrame({'y': list(yf), 'x': list(xf)}).to_dict('records')
     
-    def _get_periodogram_data(self, df: DataFrame) -> dict:
+    def _get_periodogram_data_by_widnow(self, df: DataFrame, window: str) -> dict: 
         Y_header_name = df.columns.tolist()[1]
         y = df[Y_header_name].to_list()
         fd = self._get_chastota_descritiatcii(df)
-        xp, yp = periodogram(y, fd)
+        xp, yp = periodogram(y, fd, window)
         return DataFrame({'y': list(yp), 'x': list(xp)}).to_dict('list')
     
+    def _get_periodogram_data(self, df: DataFrame) -> dict:
+        return self._get_periodogram_data_by_widnow(df, 'boxcar')
+    
     def _get_triangle_periodogram_data(self, df: DataFrame) -> dict:
-        Y_header_name = df.columns.tolist()[1]
-        y = df[Y_header_name].to_list()
-        fd =  self._get_chastota_descritiatcii(df)
-        x, y = periodogram(y, fd, window='triang')
-        return DataFrame({'y': list(y), 'x': list(x)}).to_dict('list')
+        return self._get_periodogram_data_by_widnow(df, 'triang')
     
     def _get_hann_periodogram_data(self, df: DataFrame) -> dict:
-        Y_header_name = df.columns.tolist()[1]
-        y = df[Y_header_name].to_list()
-        fd =  self._get_chastota_descritiatcii(df)
-        xf = np.arange(-fd/2, fd/2, fd/len(y)) 
-        x, y = periodogram(y, fd, window='hann')
-        return DataFrame({'y': list(y), 'x': list(x)}).to_dict('list')
-
+        return self._get_periodogram_data_by_widnow(df, 'hann')
+    
+    def _get_blackman_periodogram_data(self, df: DataFrame) -> dict:
+        return self._get_periodogram_data_by_widnow(df, 'blackman')
+    
+    def _get_hamming_periodogram_data(self, df: DataFrame) -> dict:
+        return self._get_periodogram_data_by_widnow(df, 'hamming')
+    
+    def _get_bartlett_periodogram_data(self, df: DataFrame) -> dict:
+        return self._get_periodogram_data_by_widnow(df, 'bartlett')
+    
+    def _get_flattop_periodogram_data(self, df: DataFrame) -> dict:
+        return self._get_periodogram_data_by_widnow(df, 'flattop')
+    
+    def _get_parzen_periodogram_data(self, df: DataFrame) -> dict:
+        return self._get_periodogram_data_by_widnow(df, 'parzen')
+    
+    def _get_bohman_periodogram_data(self, df: DataFrame) -> dict:
+        return self._get_periodogram_data_by_widnow(df, 'bohman')
+    
+    def _get_blackmanharris_periodogram_data(self, df: DataFrame) -> dict:
+        return self._get_periodogram_data_by_widnow(df, 'blackmanharris')
+    
+    def _get_nuttall_periodogram_data(self, df: DataFrame) -> dict:
+        return self._get_periodogram_data_by_widnow(df, 'nuttall')
+    
+    def _get_barthann_periodogram_data(self, df: DataFrame) -> dict:
+        return self._get_periodogram_data_by_widnow(df, 'barthann')
+    
+    def _get_cosine_periodogram_data(self, df: DataFrame) -> dict:
+        return self._get_periodogram_data_by_widnow(df, 'cosine')
+    
+    def _get_exponential_periodogram_data(self, df: DataFrame) -> dict:
+        return self._get_periodogram_data_by_widnow(df, 'exponential')
+    
+    def _get_tukey_periodogram_data(self, df: DataFrame) -> dict:
+        return self._get_periodogram_data_by_widnow(df, 'tukey')
+    
+    def _get_taylor_periodogram_data(self, df: DataFrame) -> dict:
+        return self._get_periodogram_data_by_widnow(df, 'taylor')
+    
+    
