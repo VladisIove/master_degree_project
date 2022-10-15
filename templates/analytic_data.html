@@ -6,16 +6,14 @@
     </a>
 </li>
   <li class="nav-item">
-    <a class="nav-link" id="analysis-tab" data-toggle="tab" href="#analysis" role="tab" aria-controls="analysis" aria-selected="false">Аналіз вхідних даних</a>
+    <a class="nav-link" id="analysis-tab" data-toggle="tab" href="#analysis" role="tab" aria-controls="analysis" aria-selected="false">Завантажити дані</a>
   </li>
-  <li class="nav-item">
-    <a class="nav-link" id="frequency-analysis-tab" data-toggle="tab" href="#frequency-analysis" role="tab" aria-controls="frequency-analysis" aria-selected="false">Частотний аналіз</a>
-  </li>
+
   {% endif %}
 
   <li class="nav-item">
     <a class="nav-link {% if data.calculated_data == None %} active {%endif%}" id="info-tab" data-toggle="tab" href="#info" role="tab" aria-controls="info" aria-selected="true">
-      Графік часового аналізу
+      Опис гррафіку часового аналізу
     </a>
   </li>
 
@@ -112,35 +110,11 @@
     </div>
   </div>
   <div class="tab-pane fade" id="analysis" role="tabpanel" aria-labelledby="analysis-tab">
-    <table class="table">
-      <thead>
-        <tr>
-
-          <th scope="col">#</th>
-          {% for column_name in data.headers %}
-            <th scope="col">{{column_name}}</th>
-          {% endfor %}
-        </tr>
-      </thead>
-      <tbody>
-        {% for key, values in data.calculated_data.analytics_data.items %}
-        <tr>
-          <th scope="row">{{values.label}}</th>
-          {% for k, v in values.value.items %}
-          <td>{{v}}</td>
-          {% endfor %}
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+      <form method="post" class="col-4 m-5" action={% url 'time-analysis' %}?export=true>
+          {% include 'analytic_fields.html' with form=export_file_form button_name='Завантажити дані' %}
+      </form>
   </div>
 
-  <div class="tab-pane fade  p-5" id="frequency-analysis" role="tabpanel" aria-labelledby="frequency-analysis-tab">
-    <p class="h3">Fd: {{ data.calculated_data.graphs_data.period_descritiatcii }}</p>
-    <p class="h3">Td: {{ data.calculated_data.graphs_data.chastota_descritiatcii }}</p>
-    <p class="h3">N: {{ data.calculated_data.graphs_data.kilkist_vidlikiv }}</p>
-
-  </div>
 </div>
 <script>
   const data_for_graph = JSON.parse(`{{data.data_for_graph|safe}}`.replace(/'/g, '"'));
@@ -152,31 +126,41 @@
       backgroundColor: 'rgb(255, 99, 132)',
       borderColor: 'rgb(255, 99, 132)',
       data: data_for_graph[keys[1]],
-    },
-    {% comment %} {
-      label: 'Амплітудна модуляція',
-      backgroundColor: 'rgb(125, 222, 241)',
-      borderColor: 'rgb(125, 222, 241)',
-      data: data_for_graph[keys[2]],
-    } {% endcomment %}
+    }
     ]
   };
   
-  
+    
   const config = {
     type: 'line',
     data: data,
+    
     options: {
-      parsing: {
-        xAxisKey: keys[0],
-        yAxisKey: keys[1]
-      },
       scales: {
         x: {
           display: true,
+          title: {
+            display: true,
+            text: `${keys[0]} (с)`,
+            font: {
+              size: 24,
+            }
+          },
+          ticks: {
+            autoSkip: true,
+            maxTicksLimit: 20,
+            
+        }
         },
         y: {
           display: true,
+          title: {
+            display: true,
+            text: `${keys[1]} (Гц)`,
+            font: {
+              size: 24,
+            }
+          },
         }
     }
     }
@@ -194,6 +178,7 @@
     afterDatasetDraw: function (chart, params) {
         // Only draw after animation has finished and is the desired dataset
         if(params.meta.type == "scatter") {
+            
             var ctx = chart.ctx;
             ctx.save();
             params.meta.data.forEach(point => {
@@ -211,11 +196,13 @@
 
   const data_for_fft_graph = JSON.parse(`{{data.calculated_data.graphs_data.fft|safe}}`.replace(/'/g, '"'));
   const fft_keys = Object.keys(data_for_fft_graph)
+  console.log(data_for_fft_graph)
   const fft_data = {
-    labels: 'Fooo',
+    labels: data_for_fft_graph[fft_keys[1]],
     datasets: [
       {
-        data: data_for_fft_graph,
+        label: 'Швидке перетворення Фер\'є',
+        data: data_for_fft_graph[fft_keys[0]],
         pointRadius: 4,
         borderWidth: 1,
         borderColor: "rgba(255, 0, 0, 1)",
@@ -230,6 +217,11 @@
     type: 'line',
     data: fft_data,
     options: {
+      parsing: {
+        xAxisKey: fft_keys[0],
+        yAxisKey: fft_keys[1]
+      },
+
       animation: {
           duration: 0,
       },
@@ -240,6 +232,33 @@
       tooltips: {
           enabled: false,
       },
+      scales: {
+        x: {
+          title: {
+            display: true,
+            text: 'Частота (Гц)',
+            font: {
+              size: 24,
+            }
+          },
+          ticks: {
+            autoSkip: true,
+            maxTicksLimit: 20,
+             
+        }
+        },
+        y: {
+          display: true,
+          title: {
+            display: true,
+            text: 'Амплітуда',
+            font: {
+              size: 24,
+            }
+          },
+        }
+      }
+
   },
   plugins: [ VerticalLinePlugin ],
   };
@@ -278,12 +297,40 @@
         scales: {
           x: {
             display: true,
+            title: {
+              display: true,
+              text: 'Частота Гц',
+              font: {
+                size: 24,
+              }
+            },
+            ticks: {
+              autoSkip: true,
+              maxTicksLimit: 20,
+              
+          }
           },
           y: {
+            ticks: {
+              callback: function (value) {
+                  return numeral(value).format('0,0e+0')
+              }
+          },
             display: true,
             type: 'logarithmic',
+            title: {
+              display: true,
+              text: 'Амплітуда',
+              font: {
+                size: 24,
+              }
+            },
+         
           }
-        }
+      }
+
+       
+      
       }
     };
 

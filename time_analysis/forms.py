@@ -198,13 +198,14 @@ class TimeAnalyticForm(AnalyticBaseForm):
         xf = np.arange(-fd/2, fd/2-fd/len(y), fd/len(y)) 
         if xf.shape[0] != yf.shape[0]:
             xf = np.arange(-fd/2, fd/2, fd/len(y)) 
-        return DataFrame({'y': list(yf), 'x': list(xf)}).to_dict('records')
+        return DataFrame({'y': list(yf), 'x': list(xf.round(2))}).to_dict('list')
     
     def _get_periodogram_data_by_widnow(self, df: DataFrame, window: str) -> dict: 
         Y_header_name = df.columns.tolist()[1]
         y = df[Y_header_name].to_list()
         fd = self._get_chastota_descritiatcii(df)
         xp, yp = periodogram(y, fd, window)
+        xp = xp.round(5)
         return DataFrame({'y': list(yp), 'x': list(xp)}).to_dict('list')
     
     def _get_periodogram_data(self, df: DataFrame) -> dict:

@@ -11,16 +11,42 @@
                         {% include 'analytic_fields.html' with form=form button_name='Обробити дані' %}
                     </form>
                 {% endblock form %}
-            </div>
-    
-            <div class="border p-5 col-12 my-3">
-                {% block export_form %}
-
-                <form method="post" action={% url 'time-analysis' %}?export=true>
-                    {% include 'analytic_fields.html' with form=export_file_form button_name='Завантажити дані' %}
-                </form>
-        
-                {% endblock export_form %}
+                
+                {% if data %}
+                    <table class="table table-bordered my-5">
+                        <thead>
+                        <tr>
+                
+                            <th scope="col">#</th>
+                            {% for column_name in data.headers %}
+                            <th scope="col">{{column_name}} {% if forloop.counter == 1 %} (c) {% else %} (Гц) {% endif %}</th>
+                            {% endfor %}
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for key, values in data.calculated_data.analytics_data.items %}
+                        <tr>
+                            <th scope="row">{{values.label}}</th>
+                            {% for k, v in values.value.items %}
+                            <td>{{v|floatformat:3}}</td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                        <tr>
+                            <th scope="row">Період дескрітизації</th>
+                            <td colspan="2"> {{ data.calculated_data.graphs_data.period_descritiatcii|floatformat:5 }} (с) </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Частота дескрітизації</th>
+                            <td colspan="2"> {{ data.calculated_data.graphs_data.chastota_descritiatcii|floatformat:2 }} (Гц) </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Кількість відліків</th>
+                            <td colspan="2"> {{ data.calculated_data.graphs_data.kilkist_vidlikiv|floatformat:2 }} (б/р)</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                {% endif %}
             </div>
         </div>
 

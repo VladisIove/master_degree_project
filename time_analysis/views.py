@@ -27,6 +27,7 @@ class TimeAnalysisView(ExportFileViewMixin, FormView):
         data['headers'] = income_dataframe.columns.tolist()
         data['calculated_data'] = form.calculation_data(income_dataframe)
         data['calculated_data_json'] = json.dumps(data['calculated_data'])
+        income_dataframe = income_dataframe.round(5)
         data['data_for_graph'] = income_dataframe.to_dict('list')
         context = self.get_context_data(data=data, form=form)
         return self.render_to_response(context)
