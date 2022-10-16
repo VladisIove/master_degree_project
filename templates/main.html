@@ -46,7 +46,7 @@
     </div>
   </div>
 
-  <div class="d-flex align-items-center justify-content-around">
+  <div class="d-flex align-items-center justify-content-center">
     <div class="col-3 card" style="width: 13rem;">
         <img src="https://upload.wikimedia.org/wikipedia/commons/7/77/Random-data-plus-trend-r2.png" class="card-img-top" style="width:auto;" alt="Часовий аналіз">
         <div class="card-body">
@@ -59,5 +59,18 @@
           <a href="{% url 'time-analysis' %}" class="btn btn-primary stretched-link">Перейти</a>
         </div>
     </div>
+
+    <div class="col-3 card ml-5" style="width: 13rem;">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/7/77/Random-data-plus-trend-r2.png" class="card-img-top" style="width:auto;" alt="Часовий аналіз">
+      <div class="card-body">
+        <p class="h4 text-center card-text">
+          Кастомний часовий аналіз
+        </p>
+        <p class="card-text">
+          Сторінка по обробці детерміновах та стохастичних сигналів. 
+        </p>
+        <a href="{% url 'custom-time-analysis' %}" class="btn btn-primary stretched-link">Перейти</a>
+      </div>
+  </div>
   </div>
 {% endblock main %}
