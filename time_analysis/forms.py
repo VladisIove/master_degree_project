@@ -1,7 +1,5 @@
-from statistics import mean
 import numpy as np
 from pandas import DataFrame
-from traitlets import default
 from utils.base_forms import AnalyticBaseForm 
 
 from utils.parser_files import convertor_file_to_df
