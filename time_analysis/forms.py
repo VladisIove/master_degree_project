@@ -1,5 +1,4 @@
 from statistics import mean
-from jsonschema import ValidationError
 import numpy as np
 from pandas import DataFrame
 from traitlets import default
