@@ -12,7 +12,8 @@ class ConvertFileDataToDataFrame:
     
     def convert(self, file: IO, filename:str, delimetr: Optional[str]=None) -> DataFrame:
         convertor = self._get_convert_method(filename)
-        return convertor(file, delimetr)
+        df = convertor(file, delimetr)
+        return df
         
     def _get_convert_method(self, filename: str) -> Callable:
         convertors = {
@@ -27,7 +28,7 @@ class ConvertFileDataToDataFrame:
         return read_excel(file)
     
     def _csv_convertor(self, file: IO, delimetr: str) -> DataFrame:
-        return read_csv(file)
+        return read_csv(file, sep=',')
 
     def _txt_convertor(self, file: IO, delimetr: str) -> DataFrame:
         return read_csv(file, delimiter=delimetr)

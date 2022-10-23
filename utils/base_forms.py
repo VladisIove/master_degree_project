@@ -9,13 +9,12 @@ from django.forms.fields import ChoiceField
 from django.forms import Form, ChoiceField, HiddenInput, JSONField
 from pandas import DataFrame
 
-from utils.base_validators import validate_file_extension
-
 
 class AnalyticBaseForm(Form):
         
     def _get_graphs_data(self, df: DataFrame) -> dict:
         kilkist_vidlikiv = self._get_kilkist_vidlikiv(df)
+        
         period_descritiatcii = self._get_period_descritiatcii(df)
         chastota_descritiatcii = self._get_chastota_descritiatcii(df)
         
@@ -105,8 +104,8 @@ class AnalyticBaseForm(Form):
     @staticmethod
     def _get_quantile(df: DataFrame) -> dict:
         headers = df.columns.tolist()
-        x_rozmah = df[headers[0]].max() + math.fabs(df[headers[0]].min())
-        y_rozmah = df[headers[1]].max() + math.fabs(df[headers[1]].min())
+        x_rozmah = df[headers[0]].max() - math.fabs(df[headers[0]].min())
+        y_rozmah = df[headers[1]].max() - math.fabs(df[headers[1]].min())
         
         return {
             'label': 'Розмах',
@@ -171,9 +170,10 @@ class AnalyticBaseForm(Form):
         y = df[Y_header_name].to_list()
         fd = self._get_chastota_descritiatcii(df)
         yf = fftshift(np.abs(fft(y)/len(y)))
-        xf = np.arange(-fd/2, fd/2-fd/len(y), fd/len(y)) 
-        if xf.shape[0] != yf.shape[0]:
-            xf = np.arange(-fd/2, fd/2, fd/len(y)) 
+        start = -fd/2
+        end = fd/2
+        step = fd/len(y)
+        xf = np.arange(start, end, step)
         return DataFrame({'y': list(yf), 'x': list(xf.round(2))}).to_dict('list')
     
     def _get_periodogram_data_by_widnow(self, df: DataFrame, window: str) -> dict: 

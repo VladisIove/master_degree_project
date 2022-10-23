@@ -6,7 +6,7 @@
     </a>
 </li>
   <li class="nav-item">
-    <a class="nav-link" id="analysis-tab" data-toggle="tab" href="#analysis" role="tab" aria-controls="analysis" aria-selected="false">Завантажити дані</a>
+    <a class="nav-link" id="analysis-tab" data-toggle="tab" href="#analysis" role="tab" aria-controls="analysis" aria-selected="false">Експорт данних</a>
   </li>
 
   {% endif %}
@@ -21,6 +21,7 @@
 </ul>
 <div class="border tab-content" id="myTabContent">
   <div class="tab-pane {% if data.calculated_data == None %}  active {%endif%} p-5" id="info" role="tabpanel" aria-labelledby="info-tab">
+    
     Аналіз часових рядів — сукупність математико-статистичних методів аналізу, 
     призначених для виявлення структури часових рядів і для їх прогнозування. Сюди належать, зокрема, методи регресійного аналізу.
   </div>
@@ -29,27 +30,36 @@
     <canvas id="graph"></canvas>
 
     <div class="row">
+
       <div class="col-3">
         <div class="list-group" id="list-tab" role="tablist">
-          <a class="list-group-item list-group-item-action active" id="list-fft-list" data-toggle="list" href="#list-fft" role="tab" aria-controls="fft">Швидке перетворення Ферье</a>
-          <a class="list-group-item list-group-item-action" id="list-periodograma-list" data-toggle="list" href="#list-periodograma" role="tab" aria-controls="periodograma">Періодограма</a>
-          <a class="list-group-item list-group-item-action" id="list-triangle-list" data-toggle="list" href="#list-triangle" role="tab" aria-controls="triangle">Трикутна періодограма</a>
-          <a class="list-group-item list-group-item-action" id="list-hann-list" data-toggle="list" href="#list-hann" role="tab" aria-controls="hann">Періодограма Ханна</a>
-
-          <a class="list-group-item list-group-item-action" id="list-blackman-list" data-toggle="list" href="#list-blackman" role="tab" aria-controls="blackman">Періодограма Blackman</a>
-          <a class="list-group-item list-group-item-action" id="list-hamming-list" data-toggle="list" href="#list-hamming" role="tab" aria-controls="hamming">Періодограма Hamming</a>
-          <a class="list-group-item list-group-item-action" id="list-bartlett-list" data-toggle="list" href="#list-bartlett" role="tab" aria-controls="bartlett">Періодограма Barlett</a>
-          <a class="list-group-item list-group-item-action" id="list-flattop-list" data-toggle="list" href="#list-flattop" role="tab" aria-controls="flattop">Періодограма Flattop</a>
-          <a class="list-group-item list-group-item-action" id="list-parzen-list" data-toggle="list" href="#list-parzen" role="tab" aria-controls="parzen">Періодограма Parzen</a>
-          <a class="list-group-item list-group-item-action" id="list-bohman-list" data-toggle="list" href="#list-bohman" role="tab" aria-controls="bohman">Періодограма bohman</a>
-          <a class="list-group-item list-group-item-action" id="list-blackmanharris-list" data-toggle="list" href="#list-blackmanharris" role="tab" aria-controls="blackmanharris">Періодограма Blackmanharris</a>
-          <a class="list-group-item list-group-item-action" id="list-nuttall-list" data-toggle="list" href="#list-nuttall" role="tab" aria-controls="nuttall">Періодограма Nuttal</a>
-          <a class="list-group-item list-group-item-action" id="list-barthann-list" data-toggle="list" href="#list-barthann" role="tab" aria-controls="barthann">Періодограма Barthann</a>
-          <a class="list-group-item list-group-item-action" id="list-cosine-list" data-toggle="list" href="#list-cosine" role="tab" aria-controls="cosine">Періодограма Cosine</a>
-          <a class="list-group-item list-group-item-action" id="list-exponential-list" data-toggle="list" href="#list-exponential" role="tab" aria-controls="exponential">Експотенціальна Періодограма</a>
-          <a class="list-group-item list-group-item-action" id="list-tukey-list" data-toggle="list" href="#list-tukey" role="tab" aria-controls="tukey">Періодограма Tukey</a>
-          <a class="list-group-item list-group-item-action" id="list-taylor-list" data-toggle="list" href="#list-taylor" role="tab" aria-controls="taylor">Періодограма Тайлера</a>
+          <a class="list-group-item list-group-item-action active freq-graph" id="list-fft-list" data-toggle="list" href="#list-fft" role="tab" aria-controls="fft">Швидке перетворення Ферье</a>
+          <div class="btn-group">
+            <button type="button" class="btn btn-outline-primary dropdown-toggle text-left" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Періодограми
+            </button>
+            <div class="dropdown-menu">
+              <a class="dropdown-item freq-graph" id="list-periodograma-list" data-toggle="list" href="#list-periodograma" role="tab" aria-controls="periodograma">Періодограма</a>
+              <a class="dropdown-item freq-graph" id="list-triangle-list" data-toggle="list" href="#list-triangle" role="tab" aria-controls="triangle">Трикутна періодограма</a>
+              <a class="dropdown-item freq-graph" id="list-hann-list" data-toggle="list" href="#list-hann" role="tab" aria-controls="hann">Періодограма Ханна</a>
+              <a class="dropdown-item freq-graph" id="list-blackman-list" data-toggle="list" href="#list-blackman" role="tab" aria-controls="blackman">Періодограма Blackman</a>
+              <a class="dropdown-item freq-graph" id="list-hamming-list" data-toggle="list" href="#list-hamming" role="tab" aria-controls="hamming">Періодограма Hamming</a>
+              <a class="dropdown-item freq-graph" id="list-bartlett-list" data-toggle="list" href="#list-bartlett" role="tab" aria-controls="bartlett">Періодограма Barlett</a>
+              <a class="dropdown-item freq-graph" id="list-flattop-list" data-toggle="list" href="#list-flattop" role="tab" aria-controls="flattop">Періодограма Flattop</a>
+              <a class="dropdown-item freq-graph" id="list-parzen-list" data-toggle="list" href="#list-parzen" role="tab" aria-controls="parzen">Періодограма Parzen</a>
+              <a class="dropdown-item freq-graph" id="list-bohman-list" data-toggle="list" href="#list-bohman" role="tab" aria-controls="bohman">Періодограма bohman</a>
+              <a class="dropdown-item freq-graph" id="list-blackmanharris-list" data-toggle="list" href="#list-blackmanharris" role="tab" aria-controls="blackmanharris">Періодограма Blackmanharris</a>
+              <a class="dropdown-item freq-graph" id="list-nuttall-list" data-toggle="list" href="#list-nuttall" role="tab" aria-controls="nuttall">Періодограма Nuttal</a>
+              <a class="dropdown-item freq-graph" id="list-barthann-list" data-toggle="list" href="#list-barthann" role="tab" aria-controls="barthann">Періодограма Barthann</a>
+              <a class="dropdown-item freq-graph" id="list-cosine-list" data-toggle="list" href="#list-cosine" role="tab" aria-controls="cosine">Періодограма Cosine</a>
+              <a class="dropdown-item freq-graph" id="list-exponential-list" data-toggle="list" href="#list-exponential" role="tab" aria-controls="exponential">Експотенціальна Періодограма</a>
+              <a class="dropdown-item freq-graph" id="list-tukey-list" data-toggle="list" href="#list-tukey" role="tab" aria-controls="tukey">Періодограма Tukey</a>
+              <a class="dropdown-item freq-graph" id="list-taylor-list" data-toggle="list" href="#list-taylor" role="tab" aria-controls="taylor">Періодограма Тайлера</a>
+            </div>
+          </div>
+          
         </div>
+
       </div>
       <div class="col-9">
         <div class="tab-content" id="nav-tabContent">
@@ -111,12 +121,18 @@
   </div>
   <div class="tab-pane fade" id="analysis" role="tabpanel" aria-labelledby="analysis-tab">
       <form method="post" class="col-4 m-5" action={% url 'time-analysis' %}?export=true>
-          {% include 'analytic_fields.html' with form=export_file_form button_name='Завантажити дані' %}
+          {% include 'analytic_fields.html' with form=export_file_form button_name='Експорт данних' %}
       </form>
   </div>
 
 </div>
 <script>
+
+  $( ".freq-graph" ).click(() => {
+    $(".freq-graph").removeClass("active")
+  });
+  
+
   const data_for_graph = JSON.parse(`{{data.data_for_graph|safe}}`.replace(/'/g, '"'));
   const keys = Object.keys(data_for_graph)
   const data = {
@@ -149,11 +165,14 @@
           ticks: {
             autoSkip: true,
             maxTicksLimit: 20,
-            
-        }
+            callback: (value, index, ticks) => parseInt(value)
+          }
         },
         y: {
           display: true,
+          ticks: {
+            callback: (value, index, ticks) => parseInt(value)
+          },
           title: {
             display: true,
             text: `${keys[1]} (Гц)`,
@@ -196,7 +215,6 @@
 
   const data_for_fft_graph = JSON.parse(`{{data.calculated_data.graphs_data.fft|safe}}`.replace(/'/g, '"'));
   const fft_keys = Object.keys(data_for_fft_graph)
-  console.log(data_for_fft_graph)
   const fft_data = {
     labels: data_for_fft_graph[fft_keys[1]],
     datasets: [
@@ -234,6 +252,7 @@
       },
       scales: {
         x: {
+          
           title: {
             display: true,
             text: 'Частота (Гц)',
@@ -244,8 +263,8 @@
           ticks: {
             autoSkip: true,
             maxTicksLimit: 20,
-             
-        }
+            callback: (value, index, ticks) => parseInt(value)
+          }
         },
         y: {
           display: true,
@@ -256,6 +275,9 @@
               size: 24,
             }
           },
+          ticks: {
+            callback: (value, index, ticks) => parseInt(value)
+          }
         }
       }
 
@@ -307,8 +329,8 @@
             ticks: {
               autoSkip: true,
               maxTicksLimit: 20,
-              
-          }
+              callback: (value, index, ticks) => parseInt(value)
+            }
           },
           y: {
             ticks: {
@@ -324,7 +346,7 @@
               font: {
                 size: 24,
               }
-            },
+            }
          
           }
       }
