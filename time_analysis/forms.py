@@ -57,6 +57,9 @@ class CustomAnalyitcForm(AnalyticBaseForm):
         (SignalType.SIN, 'sin')
     ) 
     
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+    
     type_of_signal = ChoiceField(required=False, choices=SIGNAL_TYPE)
     mean = FloatField(label='Середне значення', required=True)
     scope = FloatField(label='Розмах', required=True)
@@ -76,13 +79,17 @@ class CustomAnalyitcForm(AnalyticBaseForm):
     def get_dataframe(self) -> DataFrame:
         N = self.cleaned_data['count_of_dots']
         f = self.cleaned_data['frequency']
-        fd = self.cleaned_data['frequency_sampling']
+        
         Td = self.cleaned_data['period_sampling']
+        
         type_of_signal = self.cleaned_data['type_of_signal']
         rozmah = self.cleaned_data['scope']
-        p = 1 / f 
-        t = np.arange(Td,2*p,Td)
-        y = rozmah/2+getattr(np, type_of_signal)(2*np.pi*t*f)
+        mean = self.cleaned_data['mean']
+        
+        T = 1/f
+        p = N*Td/T
+        t = np.arange(Td,p*T+Td,Td)
+        y = mean+rozmah*getattr(np, type_of_signal)(2*np.pi*t*f)
         return DataFrame({'t': t.tolist(), 'y': y.tolist()})
     
     def is_valid(self) -> bool:

@@ -12,7 +12,11 @@
             <div class="border p-5 col-12"> 
                 {% block form %}
                     <form method="post" enctype="multipart/form-data" action={% url request.resolver_match.url_name %}>
-                        {% include 'analytic_fields.html' with form=form button_name='Обробити дані' %}
+                        {% if request.resolver_match.url_name == "time-analysis" %}
+                            {% include 'analytic_fields.html' with form=form button_name='Обробити дані' %}
+                        {% else %}
+                            {% include 'analytic_fields_with_range.html' with form=form button_name='Обробити дані' %}
+                        {% endif %}
                     </form>
                 {% endblock form %}
                 

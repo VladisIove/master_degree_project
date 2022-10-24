@@ -128,6 +128,17 @@
 </div>
 <script>
 
+  $( "#id_frequency_sampling" ).on('input', (e) =>  {
+    var fd = $('#id_frequency_sampling').val();
+    $("#id_period_sampling").val(1/fd);
+  });
+
+  $( "#id_period_sampling" ).on('input', (e) =>  {
+    var td = $('#id_period_sampling').val();
+    $("#id_frequency_sampling").val(1/td);
+  });
+
+
   $( ".freq-graph" ).click(() => {
     $(".freq-graph").removeClass("active")
   });
@@ -170,9 +181,6 @@
         },
         y: {
           display: true,
-          ticks: {
-            callback: (value, index, ticks) => parseInt(value)
-          },
           title: {
             display: true,
             text: `${keys[1]} (Гц)`,

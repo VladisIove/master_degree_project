@@ -38,7 +38,29 @@ class CustomAnalyticView(ExportFileViewMixin, FormView):
     template_name = "time_analysis.html"
     form_class = CustomAnalyitcForm
     
+    def default_data(self):
+        
+        with open('./time_analysis/result.json', 'r') as fcc_file:
+            data = json.load(fcc_file)
+            print(data)
+        return {
+            'data': data,
+            'form': self.form_class(
+                    data = dict(
+                    type_of_signal = self.form_class.SignalType.SIN,
+                    mean = 3,
+                    scope = 1,
+                    count_of_dots = 512,
+                    frequency_sampling = 1706.67,
+                    period_sampling = 0.00059,
+                    frequency = 20
+                    )
+            )
+        }
+    
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        if not kwargs:
+            kwargs = self.default_data()  
         context_data = super().get_context_data(**kwargs)
         if kwargs:
             context_data['export_file_form'] = DownloadAnalyticFilesForm(data={'context_data_field': kwargs.get('data', {}).get('calculated_data_json'), 'file_type': DownloadAnalyticFilesForm.FileType.TXT})
