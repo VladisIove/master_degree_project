@@ -42,7 +42,6 @@ class CustomAnalyticView(ExportFileViewMixin, FormView):
         
         with open('./time_analysis/result.json', 'r') as fcc_file:
             data = json.load(fcc_file)
-            print(data)
         return {
             'data': data,
             'form': self.form_class(
@@ -52,7 +51,7 @@ class CustomAnalyticView(ExportFileViewMixin, FormView):
                     scope = 1,
                     count_of_dots = 512,
                     frequency_sampling = 1706.67,
-                    period_sampling = 0.00059,
+                    period_sampling = 0.000585936355,
                     frequency = 20
                     )
             )

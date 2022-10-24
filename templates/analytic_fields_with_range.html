@@ -1,12 +1,107 @@
 {% load crispy_forms_tags %}
 
 {% csrf_token %}
-{% for field in form %}
-    <div class="row">
-        <div class="col-12">
-        {{ field|as_crispy_field }}
-        </div>
+
+
+
+
+<div class="row">
+    <div class="col-12">
+    {{ form.type_of_signal|as_crispy_field }}
     </div>
-{% endfor %}
+</div>
+
+<div class="form-group row">
+    <label class="col-sm-4 col-form-label" for="{{ form.mean.auto_id }}">{{ form.mean.label }}</label>
+    <div class="col-sm-8">
+        <input type="number" name="{{form.mean.name}}" value="{{form.mean.value}}" step="any" class="numberinput form-control" required="" id="{{form.mean.auto_id}}">
+    </div>
+    
+</div>
+
+<div class="form-group row">
+    <label class="col-sm-4 col-form-label" for="{{ form.scope.auto_id }}">{{ form.scope.label }}</label>
+    <div class="col-sm-8">
+        <input type="number" name="{{form.scope.name}}" value="{{form.scope.value}}" step="any" class="numberinput form-control" required="" id="{{form.scope.auto_id}}">
+    </div>
+</div>
+
+<div class="form-group row">
+    <label class="col-sm-4 col-form-label" for="{{ form.count_of_dots.auto_id }}">{{ form.count_of_dots.label }}</label>
+    <div class="col-sm-8">
+        <input type="number" name="{{form.count_of_dots.name}}" value="{{form.count_of_dots.value}}" step="any" class="numberinput form-control" required="" id="{{form.count_of_dots.auto_id}}">
+    </div>
+</div>
+
+<div class="form-group row">
+    <label class="col-sm-4 col-form-label" for="{{ form.frequency_sampling.auto_id }}">{{ form.frequency_sampling.label }}</label>
+    <div class="col-sm-8">
+        <input type="number" name="{{form.frequency_sampling.name}}" value="{{form.frequency_sampling.value}}" step="any" class="numberinput form-control" required="" id="{{form.frequency_sampling.auto_id}}">
+    </div>
+    {{ form.mean.errors }}
+</div>
+
+<div class="form-group row">
+    <label class="col-sm-4 col-form-label" for="{{ form.period_sampling.auto_id }}">{{ form.period_sampling.label }}</label>
+    <div class="col-sm-8">
+        <input type="number" name="{{form.period_sampling.name}}" value="{{form.period_sampling.value}}" step="any" class="numberinput form-control" required="" id="{{form.period_sampling.auto_id}}">
+    </div>
+</div>
+
+<div class="form-group row">
+    <label class="col-sm-4 col-form-label" for="{{ form.frequency.auto_id }}">{{ form.frequency.label }}</label>
+    <div class="col-sm-8">
+        <input type="number" name="{{form.frequency.name}}" value="{{form.frequency.value}}" step="any" class="numberinput form-control" required="" id="{{form.frequency.auto_id}}">
+    </div>
+</div>
+
+{% if form.errors %}
+    {% for messages in form.errors.values %}
+        {% for message in messages %}
+            <div class="alert alert-danger">
+                {{message}}
+            </div>
+        {% endfor %}
+    {% endfor %}
+{% endif %}
 
 <button type="submit" class="btn btn-success">{{ button_name }}</button>
+
+<script>
+
+    $( "#id_frequency_sampling" ).on('input', (e) =>  {
+        var fd = $('#id_frequency_sampling').val();
+        $("#id_period_sampling").val(1/fd);
+        $("#id_frequency").val(fd/2);
+        
+      });
+    
+      $( "#id_period_sampling" ).on('input', (e) =>  {
+        var td = $('#id_period_sampling').val();
+        $("#id_frequency_sampling").val(1/td);
+        $("#id_frequency").val((1/td)/2);
+      });
+
+      $( "#id_frequency" ).on('input', (e) =>  {
+        var f = $('#id_frequency').val();
+        $("#id_frequency_sampling").val(f*2);
+        $("#id_period_sampling").val(1/(f*2));
+      });
+    
+
+{% comment %} 
+    $("#range").ionRangeSlider({
+        grid: true,
+        from: 1,
+        to: 6,
+        values: [
+          "", "Tenth",
+          "Diploma", "Twelth", "Graduate",
+          "PostGraduate", "P.hd"
+        ],
+        onChange: function(data) {
+      
+        }
+      }); {% endcomment %}
+
+</script>

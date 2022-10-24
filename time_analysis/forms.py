@@ -1,9 +1,10 @@
+from decimal import Decimal
 import numpy as np
 from pandas import DataFrame
 from utils.base_forms import AnalyticBaseForm 
 
 from utils.parser_files import convertor_file_to_df
-from django.forms import FileField, FloatField, IntegerField, ChoiceField
+from django.forms import FileField, FloatField, IntegerField, ChoiceField, DecimalField
 from pandas import DataFrame
 
 from utils.base_validators import validate_file_extension
@@ -57,9 +58,6 @@ class CustomAnalyitcForm(AnalyticBaseForm):
         (SignalType.SIN, 'sin')
     ) 
     
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-    
     type_of_signal = ChoiceField(required=False, choices=SIGNAL_TYPE)
     mean = FloatField(label='Середне значення', required=True)
     scope = FloatField(label='Розмах', required=True)
@@ -89,7 +87,9 @@ class CustomAnalyitcForm(AnalyticBaseForm):
         T = 1/f
         p = N*Td/T
         t = np.arange(Td,p*T+Td,Td)
-        y = mean+rozmah*getattr(np, type_of_signal)(2*np.pi*t*f)
+        z = 2*np.pi*t*f
+        z = z.astype('float64')
+        y = float(mean)+float(rozmah)*getattr(np, type_of_signal)(z)
         return DataFrame({'t': t.tolist(), 'y': y.tolist()})
     
     def is_valid(self) -> bool:
@@ -98,7 +98,7 @@ class CustomAnalyitcForm(AnalyticBaseForm):
         frequency_sampling = self.cleaned_data['frequency_sampling']
         period_sampling = self.cleaned_data['period_sampling']
         
-        if not ( frequency * 2 < frequency_sampling) :
+        if not ( frequency * 2 <= frequency_sampling) :
             self.errors['frequency'] = ['Частота та частота дискретизації не співпадають за теоремою Найквіста Коперніка', ]
             return False
         
