@@ -158,9 +158,8 @@ class AnalyticBaseForm(Form):
     def _get_period_descritiatcii(df: DataFrame) -> float:
         X_header_name = df.columns.tolist()[0]
         x = df[X_header_name].to_list()
-        for index, item in enumerate(x):
-            if x[index+1] - item:  
-                return math.fabs(item)
+        return math.fabs(x[1] - x[0])
+
     
     def _get_fft_data(self, df: DataFrame) -> dict:
         '''
@@ -169,12 +168,14 @@ class AnalyticBaseForm(Form):
         Y_header_name = df.columns.tolist()[1]
         y = df[Y_header_name].to_list()
         fd = self._get_chastota_descritiatcii(df)
-        yf = fftshift(np.abs(fft(y)/len(y)))
+        N = len(y)
+        yf = fftshift(np.abs(fft(y)/N))
         start = -fd/2
         end = fd/2
-        step = fd/len(y)
+        step = fd/N
         xf = np.arange(start, end, step)
-        return DataFrame({'y': list(yf), 'x': list(xf.round(2))}).to_dict('list')
+        
+        return DataFrame({'y': list(yf), 'x': list(xf.round(0))}).to_dict('list')
     
     def _get_periodogram_data_by_widnow(self, df: DataFrame, window: str) -> dict: 
         Y_header_name = df.columns.tolist()[1]

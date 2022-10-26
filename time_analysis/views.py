@@ -49,7 +49,7 @@ class CustomAnalyticView(ExportFileViewMixin, FormView):
                     type_of_signal = self.form_class.SignalType.SIN,
                     mean = 3,
                     scope = 1,
-                    count_of_dots = 512,
+                    count_of_periods = 6,
                     frequency_sampling = 1706.67,
                     period_sampling = 0.000585936355,
                     frequency = 20

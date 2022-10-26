@@ -1,4 +1,5 @@
 
+from decimal import Decimal
 import numpy as np
 from pandas import DataFrame
 from utils.base_forms import AnalyticBaseForm 
@@ -60,10 +61,11 @@ class CustomAnalyitcForm(AnalyticBaseForm):
     type_of_signal = ChoiceField(required=False, choices=SIGNAL_TYPE)
     mean = FloatField(label='Середне значення', required=True)
     scope = FloatField(label='Розмах', required=True)
-    count_of_dots = IntegerField(label='Кількість точок', required=True)
+    # count_of_dots = IntegerField(label='Кількість точок', required=True)
     frequency_sampling = FloatField(label='Частота дискретизації', required=True)
     period_sampling = FloatField(label='Період дискретизації', required=True)
-    frequency = FloatField(label='Частота', required=True)
+    frequency = IntegerField(label='Частота', required=True)
+    count_of_periods = IntegerField(label='Кількість періодів', required=True)
     
     def calculation_data(self, df: DataFrame) -> dict:
         analytics_data = self._determination_data(df)
@@ -74,21 +76,20 @@ class CustomAnalyitcForm(AnalyticBaseForm):
         }
         
     def get_dataframe(self) -> DataFrame:
-        N = self.cleaned_data['count_of_dots']
         f = self.cleaned_data['frequency']
-        
         Td = self.cleaned_data['period_sampling']
         
         type_of_signal = self.cleaned_data['type_of_signal']
         rozmah = self.cleaned_data['scope']
         mean = self.cleaned_data['mean']
+        p = self.cleaned_data['count_of_periods']
         
         T = 1/f
-        p = N*Td/T
-        t = np.arange(Td,p*T+Td,Td)
+        t = np.arange(0,p*T-Td,Td)
         z = 2*np.pi*t*f
-        z = z.astype('float64')
-        y = float(mean)+float(rozmah)*getattr(np, type_of_signal)(z)
+        zz = rozmah*getattr(np, type_of_signal)(z)
+        y = float(mean)+ zz
+        
         return DataFrame({'t': t.tolist(), 'y': y.tolist()})
     
     def is_valid(self) -> bool:

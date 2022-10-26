@@ -27,12 +27,12 @@
 </div>
 
 <div class="form-group row">
-    <label class="col-sm-4 col-form-label" for="{{ form.count_of_dots.auto_id }}">{{ form.count_of_dots.label }}</label>
+    <label class="col-sm-4 col-form-label" for="{{ form.count_of_periods.auto_id }}">{{ form.count_of_periods.label }}</label>
     <div class="col-sm-8">
-        <input type="number" min=2 name="{{form.count_of_dots.name}}" value="{{form.count_of_dots.value}}" step="any" class="numberinput form-control" required="" id="{{form.count_of_dots.auto_id}}">
+        <input type="number" min=2 name="{{form.count_of_periods.name}}" value="{{form.count_of_periods.value}}" step="any" class="numberinput form-control" required="" id="{{form.count_of_periods.auto_id}}">
     </div>
     <div class="col-sm-12">
-        <input type="range" value="{{form.count_of_dots.value}}" class="slider" id="count_of_dots_range">
+        <input type="range" value="{{form.count_of_periods.value}}" class="slider" id="count_of_periods_range">
     </div>
 </div>
 
@@ -81,9 +81,21 @@
     {% endfor %}
 {% endif %}
 
-<button type="submit" class="btn btn-success">{{ button_name }}</button>
+<button type="submit" class="btn btn-success d-none" id="butt">{{ button_name }}</button>
 
 <script>
+
+    var time_reloud = null; 
+
+    let timerId = setInterval(
+        () => {
+            if(
+                time_reloud && Date.now() - time_reloud > 1500
+            ){
+                $("#butt").click();
+            }
+        }, 
+    1500);
 
     const freq_range_updater = (N) => {
         var slider = $("#frequency_sampling_range").data("ionRangeSlider");
@@ -94,8 +106,6 @@
         }
         update_data = {
             from: N,
-            max: parseInt(N) + 1000,
-            min: 0
         }
         slider.update(update_data)
     };
@@ -105,9 +115,7 @@
     const f_range_updater = (N) => {
         var slider = $("#frequency_range").data("ionRangeSlider");
         update_data = {
-            from: N,
-            max: parseInt(N) + 20,
-            min: 0
+            from: N
         }
         slider.update(update_data)
     };
@@ -116,12 +124,26 @@
     const period_range_updater = (N) => {
         var slider = $("#period_sampling_range").data("ionRangeSlider");
         update_data = {
-            from: N,
-            max: parseInt(N) + 10,
-            min: 0
+            from: N
         }
         slider.update(update_data)
     }
+
+    $("#id_count_of_periods").on('input', (e) =>  {
+        time_reloud = Date.now();
+    });
+
+    $("#id_scope").on('input', (e) =>  {
+        time_reloud = Date.now();
+    });
+
+    $("#id_mean").on('input', (e) =>  {
+        time_reloud = Date.now();
+    });
+
+    $("#id_type_of_signal").change((e) =>  {
+        time_reloud = Date.now();
+    });
 
     $( "#id_frequency_sampling" ).on('input', (e) =>  {
         var fd = $('#id_frequency_sampling').val();
@@ -130,11 +152,11 @@
             $('#id_frequency_sampling').val(fd);
         }
         $("#id_period_sampling").val(1/fd);
-        $("#id_frequency").val(fd/2);
+        $("#id_frequency").val(parseInt(fd/2));
         freq_range_updater(fd);
         period_range_updater(1/fd);
-        f_range_updater(fd/2);
-        
+        f_range_updater(parseInt(fd/2));
+        time_reloud = Date.now();
       });
     
       $( "#id_period_sampling" ).on('input', (e) =>  {
@@ -144,10 +166,11 @@
             $('#id_period_sampling').val(td);
         }
         $("#id_frequency_sampling").val(1/td);
-        $("#id_frequency").val((1/td)/2);
+        $("#id_frequency").val(parseInt((1/td)/2));
         freq_range_updater(1/td);
         period_range_updater(td);
-        f_range_updater((1/td)/2);
+        f_range_updater(parseInt((1/td)/2));
+        time_reloud = Date.now();
       });
 
       $( "#id_frequency" ).on('input', (e) =>  {
@@ -156,43 +179,46 @@
             f = 0;
             $('#id_frequency').val(f);
         }
-        $("#id_frequency_sampling").val(f*2);
-        $("#id_period_sampling").val(1/(f*2));
-        freq_range_updater(f*2);
-        period_range_updater(1/(f*2));
+        var fd = $('#id_frequency_sampling').val();
+        if(f*2 > fd){
+            console.log(fd, f)
+            $("#id_frequency_sampling").val(f*2);
+            freq_range_updater(f*2);
+            period_range_updater(1/(f*2));
+            $("#id_period_sampling").val(1/(f*2));
+        }
+
         f_range_updater(f);
+        time_reloud = Date.now();
       });
       
-      $( "#id_count_of_dots" ).on('input', (e) =>  {
-        var N = $('#id_count_of_dots').val();
-        var slider = $("#count_of_dots_range").data("ionRangeSlider");
+      $( "#count_of_periods" ).on('input', (e) =>  {
+        var N = $('#count_of_periods').val();
+        var slider = $("#count_of_periods_range").data("ionRangeSlider");
         
-        if(N < 2){
-            N = 2;
-            $('#id_count_of_dots').val(N);
+        if(N < 1){
+            N = 1;
+            $('#count_of_periods').val(N);
         }
 
         update_data = {
             from: N,
         }
-        if (Math.pow(2, 13) < N)
-            update_data['max'] = N 
-        else 
-            update_data['max'] = Math.pow(2, 13)
-
-        slider.update(update_data)
+        slider.update(update_data);
+        time_reloud = Date.now();
       });
 
 
-    $("#count_of_dots_range").ionRangeSlider({
+    $("#count_of_periods_range").ionRangeSlider({
         grid: true,
         skin: "big",
         type: "single",
-        from: `{{form.count_of_dots.value}}`,
+        from: `{{form.count_of_periods.value}}`,
         min: 2,
-        max: Math.pow(2, 13),
+        max: 200,
         onChange: function(data) {
-            $("#id_count_of_dots").val(data.from)
+            $("#id_count_of_periods").val(data.from);
+            time_reloud = Date.now();
         }
       }); 
 
@@ -202,11 +228,15 @@
         type: "single",
         from: `{{form.frequency_sampling.value}}`,
         min: 0,
-        max: parseInt(`{{form.frequency_sampling.value}}`)+1000,
+        max: 10000,
         onChange: function(data) {
             $("#id_frequency_sampling").val(data.from);
             $("#id_period_sampling").val(1/data.from);
-            $("#id_frequency").val(data.from/2);
+            $("#id_frequency").val(parseInt(data.from/2));
+
+            period_range_updater(1/data.from);
+            f_range_updater(parseInt(data.from/2));
+            time_reloud = Date.now();
         }
       }); 
 
@@ -217,11 +247,16 @@
         type: "single",
         from: `{{form.period_sampling.value}}`,
         min: 0,
-        max: parseInt(`{{form.period_sampling.value}}`)+10,
+        step: 0.000001,
+        max: 1,
         onChange: function(data) {
             $("#id_period_sampling").val(data.from);
             $("#id_frequency_sampling").val(1/data.from);
-            $("#id_frequency").val((1/data.from)/2);
+            $("#id_frequency").val(parseInt((1/data.from)/2));
+
+            freq_range_updater(1/data.from);
+            f_range_updater(parseInt((1/data.from)/2));
+            time_reloud = Date.now();
         }
       }); 
 
@@ -231,11 +266,18 @@
         type: "single",
         from: `{{form.frequency.value}}`,
         min: 0,
-        max: parseInt(`{{form.frequency.value}}`)+20,
+        max: 200,
         onChange: function(data) {
             $("#id_frequency").val(data.from);
-            $("#id_frequency_sampling").val(data.from*2);
-            $("#id_period_sampling").val(1/(data.from*2));
+
+            var fd = $('#id_frequency_sampling').val();
+            if(data.from*2 > fd){
+                $("#id_frequency_sampling").val(data.from*2);
+                freq_range_updater(data.from*2);
+                period_range_updater(1/(data.from*2));
+                $("#id_period_sampling").val(1/(data.from*2));
+            }
+            time_reloud = Date.now();
         }
       }); 
 

@@ -162,11 +162,6 @@
             font: {
               size: 24,
             }
-          },
-          ticks: {
-            autoSkip: true,
-            maxTicksLimit: 20,
-            callback: (value, index, ticks) => parseInt(value)
           }
         },
         y: {
@@ -228,7 +223,6 @@
     ]
   };
   
-  
   const fft_config = {
     type: 'line',
     data: fft_data,
@@ -259,9 +253,13 @@
             }
           },
           ticks: {
+            maxTicksLimit: 13,
             autoSkip: true,
-            maxTicksLimit: 20,
-            callback: (value, index, ticks) => parseInt(value)
+            source: 'data',
+            callback: (value, index, ticks) => {
+              let _value = data_for_fft_graph[fft_keys[1]][value]
+              return parseInt(_value)
+            }
           }
         },
         y: {
@@ -273,9 +271,6 @@
               size: 24,
             }
           },
-          ticks: {
-            callback: (value, index, ticks) => parseInt(value)
-          }
         }
       }
 
