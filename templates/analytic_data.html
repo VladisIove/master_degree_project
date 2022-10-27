@@ -31,14 +31,15 @@
 
     <div class="row">
 
-      <div class="col-3">
+      <div class="col-3 p-0">
         <div class="list-group" id="list-tab" role="tablist">
-          <a class="list-group-item list-group-item-action active freq-graph" id="list-fft-list" data-toggle="list" href="#list-fft" role="tab" aria-controls="fft">Швидке перетворення Ферье</a>
+
           <div class="btn-group">
             <button type="button" class="btn btn-outline-primary dropdown-toggle text-left" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              Періодограми
+              Частотний аналіз
             </button>
             <div class="dropdown-menu">
+              <a class="dropdown-item freq-graph active" id="list-fft-list" data-toggle="list" href="#list-fft" role="tab" aria-controls="fft">Швидке перетворення Ферье</a>
               <a class="dropdown-item freq-graph" id="list-periodograma-list" data-toggle="list" href="#list-periodograma" role="tab" aria-controls="periodograma">Періодограма</a>
               <a class="dropdown-item freq-graph" id="list-triangle-list" data-toggle="list" href="#list-triangle" role="tab" aria-controls="triangle">Трикутна періодограма</a>
               <a class="dropdown-item freq-graph" id="list-hann-list" data-toggle="list" href="#list-hann" role="tab" aria-controls="hann">Періодограма Ханна</a>
@@ -59,7 +60,9 @@
           </div>
           
         </div>
-
+        <div class="col-12 d-none p-0 mt-3" id="periodograma_div">
+          <canvas id="only-periodograma-graph"></canvas>
+        </div>
       </div>
       <div class="col-9">
         <div class="tab-content" id="nav-tabContent">
@@ -128,11 +131,6 @@
 </div>
 <script>
 
-
-     
-  $( ".freq-graph" ).click(() => {
-    $(".freq-graph").removeClass("active")
-  }); 
 
   const data_for_graph = JSON.parse(`{{data.data_for_graph|safe}}`.replace(/'/g, '"'));
   const keys = Object.keys(data_for_graph)
@@ -407,4 +405,109 @@
   const data_for_taylor_periodogram_graph = JSON.parse(`{{data.calculated_data.graphs_data.taylor_periodogram|safe}}`.replace(/'/g, '"'));
   periodogram_builder('taylor-periodogram-graph', data_for_taylor_periodogram_graph, 'Періодограма Тайлера');
 
+  const _l = data_for_graph[keys[0]].length
+  const _x =  [...Array(_l).keys()];
+
+  const periodogram_without_signal_periodogram = JSON.parse(`{{data.calculated_data.graphs_data.periodograms_without_signal.periodogram|safe}}`.replace(/'/g, '"'));
+  const triangle_periodogram = JSON.parse(`{{data.calculated_data.graphs_data.periodograms_without_signal.triangle_periodogram|safe}}`.replace(/'/g, '"'));
+  const hann_periodogram = JSON.parse(`{{data.calculated_data.graphs_data.periodograms_without_signal.hann_periodogram|safe}}`.replace(/'/g, '"'));
+
+  const blackman_periodogram = JSON.parse(`{{data.calculated_data.graphs_data.periodograms_without_signal.blackman_periodogram|safe}}`.replace(/'/g, '"'));
+  const hamming_periodogram = JSON.parse(`{{data.calculated_data.graphs_data.periodograms_without_signal.hamming_periodogram|safe}}`.replace(/'/g, '"'));
+  const bartlett_periodogram = JSON.parse(`{{data.calculated_data.graphs_data.periodograms_without_signal.bartlett_periodogram|safe}}`.replace(/'/g, '"'));
+  const flattop_periodogram = JSON.parse(`{{data.calculated_data.graphs_data.periodograms_without_signal.flattop_periodogram|safe}}`.replace(/'/g, '"'));
+  const parzen_periodogram = JSON.parse(`{{data.calculated_data.graphs_data.periodograms_without_signal.parzen_periodogram|safe}}`.replace(/'/g, '"'));
+  const bohman_periodogram = JSON.parse(`{{data.calculated_data.graphs_data.periodograms_without_signal.bohman_periodogram|safe}}`.replace(/'/g, '"'));
+  const blackmanharris_periodogram = JSON.parse(`{{data.calculated_data.graphs_data.periodograms_without_signal.blackmanharris_periodogram|safe}}`.replace(/'/g, '"'));
+  const nuttall_periodogram = JSON.parse(`{{data.calculated_data.graphs_data.periodograms_without_signal.nuttall_periodogram|safe}}`.replace(/'/g, '"'));
+  const barthann_periodogram = JSON.parse(`{{data.calculated_data.graphs_data.periodograms_without_signal.barthann_periodogram|safe}}`.replace(/'/g, '"'));
+  const cosine_periodogram = JSON.parse(`{{data.calculated_data.graphs_data.periodograms_without_signal.cosine_periodogram|safe}}`.replace(/'/g, '"'));
+  const exponential_periodogram = JSON.parse(`{{data.calculated_data.graphs_data.periodograms_without_signal.exponential_periodogram|safe}}`.replace(/'/g, '"'));
+
+  const tukey_periodogram = JSON.parse(`{{data.calculated_data.graphs_data.periodograms_without_signal.tukey_periodogram|safe}}`.replace(/'/g, '"'));
+  const taylor_periodogram = JSON.parse(`{{data.calculated_data.graphs_data.periodograms_without_signal.taylor_periodogram|safe}}`.replace(/'/g, '"'));
+
+  console.log(periodogram_without_signal_periodogram)
+  const periodogram_data = {
+    labels: _x,
+    datasets: [{
+      label: 'Віконна функція',
+      backgroundColor: 'rgb(255, 99, 132)',
+      borderColor: 'rgb(255, 99, 132)',
+      data: periodogram_without_signal_periodogram,
+    }
+    ]
+  };
+
+  const periodogram_matcher = {
+    "list-periodograma-list": periodogram_data,
+    "list-triangle-list": triangle_periodogram,
+    "list-hann-list": hann_periodogram, 
+    "list-blackman-list": blackman_periodogram,
+    "list-hamming-list": hamming_periodogram,
+    "list-bartlett-list": bartlett_periodogram,
+    "list-flattop-list": flattop_periodogram,
+    "list-parzen-list": parzen_periodogram,
+    "list-bohman-list": bohman_periodogram,
+    "list-blackmanharris-list": blackmanharris_periodogram,
+    "list-nuttall-list": nuttall_periodogram,
+    "list-barthann-list": barthann_periodogram,
+    "list-cosine-list": cosine_periodogram,
+    "list-exponential-list": exponential_periodogram,
+    "list-tukey-list": tukey_periodogram,
+    "list-taylor-list": taylor_periodogram,
+  }
+
+ 
+  
+    
+  const _config = {
+    type: 'line',
+    data: periodogram_data,
+    
+    options: {
+      scales: {
+        x: {
+          display: true,
+          title: {
+            display: true,
+            text: `Частота (Гц)`,
+            font: {
+              size: 12,
+            }
+          }
+        },
+        y: {
+          display: true,
+          title: {
+            display: true,
+            text: `Aмплітуда`,
+            font: {
+              size: 12,
+            }
+          },
+        }
+    }
+    }
+  };
+
+  const onlyPeriodogramaGraph = new Chart(
+    document.getElementById('only-periodograma-graph'),
+    _config
+  );
+
+  $( ".freq-graph" ).click((e, t) => {
+    $(".freq-graph").removeClass("active");
+    const target_id = e.target.id;
+    if(target_id === "list-fft-list"){
+      $("#periodograma_div").addClass("d-none");
+    }else{
+      $("#periodograma_div").removeClass("d-none");
+      onlyPeriodogramaGraph.data.datasets[0].data = periodogram_matcher[target_id];
+      onlyPeriodogramaGraph.update()
+    }
+  }); 
+
+
+  
 </script>

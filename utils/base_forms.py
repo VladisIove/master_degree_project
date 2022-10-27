@@ -4,11 +4,15 @@ import numpy as np
 from pandas import DataFrame
 from scipy.fft import fft, fftshift
 from scipy.signal import hilbert, periodogram
+from scipy.signal.windows import (
+    hann, taylor, boxcar, triang, blackman, hamming, bartlett, flattop, 
+    parzen, bohman, blackmanharris, nuttall, barthann, cosine,
+    exponential, tukey
+)
 
 from django.forms.fields import ChoiceField
 from django.forms import Form, ChoiceField, HiddenInput, JSONField
 from pandas import DataFrame
-
 
 class AnalyticBaseForm(Form):
         
@@ -19,7 +23,7 @@ class AnalyticBaseForm(Form):
         chastota_descritiatcii = self._get_chastota_descritiatcii(df)
         
         fft_data = self._get_fft_data(df)
-
+        periodograms_without_signal = self._get_periodograms_without_signal(df)
         return {
             'period_descritiatcii': period_descritiatcii,
             'kilkist_vidlikiv': kilkist_vidlikiv,
@@ -42,7 +46,9 @@ class AnalyticBaseForm(Form):
             'cosine_periodogram': self._get_cosine_periodogram_data(df),
             'exponential_periodogram': self._get_exponential_periodogram_data(df),
             'tukey_periodogram': self._get_tukey_periodogram_data(df),
-            'taylor_periodogram': self._get_taylor_periodogram_data(df)
+            'taylor_periodogram': self._get_taylor_periodogram_data(df),
+            
+            'periodograms_without_signal': periodograms_without_signal
         }
         
     def _stochastic_data(self, df: DataFrame) -> dict:
@@ -232,6 +238,76 @@ class AnalyticBaseForm(Form):
     
     def _get_taylor_periodogram_data(self, df: DataFrame) -> dict:
         return self._get_periodogram_data_by_widnow(df, 'taylor')
+    
+    def _get_periodograms_without_signal(self, df: DataFrame) -> dict:
+        Y_header_name = df.columns.tolist()[1]
+        y = df[Y_header_name].to_list()
+        N = len(y)
+        return {
+            'periodogram': list(boxcar(N)),
+            'triangle_periodogram': list(triang(N)),
+            'hann_periodogram': list(hann(N)),
+            'blackman_periodogram': list(blackman(N)),
+            'hamming_periodogram': list(hamming(N)),
+            'bartlett_periodogram': list(bartlett(N)),
+            'flattop_periodogram': list(flattop(N)),
+            'parzen_periodogram': list(parzen(N)),
+            'bohman_periodogram': list(bohman(N)),
+            'blackmanharris_periodogram': list(blackmanharris(N)),
+            'nuttall_periodogram': list(nuttall(N)),
+            'barthann_periodogram': list(barthann(N)),
+            'cosine_periodogram': list(cosine(N)),
+            'exponential_periodogram': list(exponential(N)),
+            'tukey_periodogram': list(tukey(N)),
+            'taylor_periodogram': list(taylor(N)),
+        }
+    
+    def _get_periodogram_boxcar_without_signal(self, N: int) -> dict:
+        window = boxcar(N)
+        A = fft(window, 2048) / (len(window)/2.0)
+        freq = np.linspace(-0.5, 0.5, len(A))
+        response = 20 * np.log10(np.abs(fftshift(A / abs(A).max())))
+        return {
+            'window': window, 
+            'freq': freq,
+            'response': response
+        }
+    
+    def _get_periodogram_triangl_without_signal(self, N: int) -> dict:
+        window = triang(N)
+        A = fft(window, 2048) / (len(window)/2.0)
+        freq = np.linspace(-0.5, 0.5, len(A))
+        response = np.abs(fftshift(A / abs(A).max()))
+        response = 20 * np.log10(np.maximum(response, 1e-10))
+        return {
+            'window': window, 
+            'freq': freq,
+            'response': response
+        }
+    
+    def _get_periodogram_hann_without_signal(self, N:int) -> dict:
+        window = hann(N)
+        A = fft(window, 2048) / (len(window)/2.0)
+        freq = np.linspace(-0.5, 0.5, len(A))
+        response = np.abs(fftshift(A / abs(A).max()))
+        response = 20 * np.log10(np.maximum(response, 1e-10))
+        return {
+            'window': window, 
+            'freq': freq,
+            'response': response
+        }
+    
+    # def _get_periodogram_blackman_without_signal(self, N: int) -> dict:
+    #     window = blackman(N)
+    #     A = fft(window, 2048) / (len(window)/2.0)
+    #     freq = np.linspace(-0.5, 0.5, len(A))
+    #     response = np.abs(fftshift(A / abs(A).max()))
+    #     response = 20 * np.log10(np.maximum(response, 1e-10))
+    #     return {
+    #         'window': window, 
+    #         'freq': freq,
+    #         'response': response
+    #     }
     
     
 
