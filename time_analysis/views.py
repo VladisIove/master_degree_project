@@ -16,7 +16,7 @@ class TimeAnalysisView(ExportFileViewMixin, FormView):
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         context_data = super().get_context_data(**kwargs)
         if kwargs:
-            context_data['export_file_form'] = DownloadAnalyticFilesForm(data={'context_data_field': kwargs.get('data', {}).get('calculated_data_json'), 'file_type': DownloadAnalyticFilesForm.FileType.TXT})
+            context_data['export_file_form'] = DownloadAnalyticFilesForm # (data={'context_data_field': kwargs.get('data', {}).get('calculated_data_json'), 'file_type': DownloadAnalyticFilesForm.FileType.TXT})
         else: 
             context_data['export_file_form'] = DownloadAnalyticFilesForm
         return context_data

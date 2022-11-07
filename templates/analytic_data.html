@@ -10,12 +10,13 @@
   </li>
 
   {% endif %}
-
+  {% if request.resolver_match.url_name == "time-analysis" %}
   <li class="nav-item">
     <a class="nav-link {% if data.calculated_data == None %} active {%endif%}" id="info-tab" data-toggle="tab" href="#info" role="tab" aria-controls="info" aria-selected="true">
       Опис гррафіку часового аналізу
     </a>
   </li>
+  {% endif %}
 
 
 </ul>
@@ -62,6 +63,7 @@
         </div>
         <div class="col-12 d-none p-0 mt-3" id="periodograma_div">
           <canvas id="only-periodograma-graph"></canvas>
+          <canvas id="only-periodograma-frequency-graph"></canvas>
         </div>
       </div>
       <div class="col-9">
@@ -427,7 +429,7 @@
   const tukey_periodogram = JSON.parse(`{{data.calculated_data.graphs_data.periodograms_without_signal.tukey_periodogram|safe}}`.replace(/'/g, '"'));
   const taylor_periodogram = JSON.parse(`{{data.calculated_data.graphs_data.periodograms_without_signal.taylor_periodogram|safe}}`.replace(/'/g, '"'));
 
-  console.log(periodogram_without_signal_periodogram)
+
   const periodogram_data = {
     labels: _x,
     datasets: [{
@@ -440,7 +442,7 @@
   };
 
   const periodogram_matcher = {
-    "list-periodograma-list": periodogram_data,
+    "list-periodograma-list": periodogram_without_signal_periodogram,
     "list-triangle-list": triangle_periodogram,
     "list-hann-list": hann_periodogram, 
     "list-blackman-list": blackman_periodogram,
@@ -457,9 +459,6 @@
     "list-tukey-list": tukey_periodogram,
     "list-taylor-list": taylor_periodogram,
   }
-
- 
-  
     
   const _config = {
     type: 'line',
@@ -471,7 +470,7 @@
           display: true,
           title: {
             display: true,
-            text: `Частота (Гц)`,
+            text: `Час (с)`,
             font: {
               size: 12,
             }
@@ -496,6 +495,148 @@
     _config
   );
 
+  const freq_periodogram_without_signal_periodogram = JSON.parse(`{{data.calculated_data.graphs_data.periodograms_without_signal_frequency.periodogram|safe}}`.replace(/'/g, '"'));
+  const freq_triangle_periodogram = JSON.parse(`{{data.calculated_data.graphs_data.periodograms_without_signal_frequency.triangle_periodogram|safe}}`.replace(/'/g, '"'));
+  const freq_hann_periodogram = JSON.parse(`{{data.calculated_data.graphs_data.periodograms_without_signal_frequency.hann_periodogram|safe}}`.replace(/'/g, '"'));
+
+  const freq_blackman_periodogram = JSON.parse(`{{data.calculated_data.graphs_data.periodograms_without_signal_frequency.blackman_periodogram|safe}}`.replace(/'/g, '"'));
+  const freq_hamming_periodogram = JSON.parse(`{{data.calculated_data.graphs_data.periodograms_without_signal_frequency.hamming_periodogram|safe}}`.replace(/'/g, '"'));
+  const freq_bartlett_periodogram = JSON.parse(`{{data.calculated_data.graphs_data.periodograms_without_signal_frequency.bartlett_periodogram|safe}}`.replace(/'/g, '"'));
+  const freq_flattop_periodogram = JSON.parse(`{{data.calculated_data.graphs_data.periodograms_without_signal_frequency.flattop_periodogram|safe}}`.replace(/'/g, '"'));
+  const freq_parzen_periodogram = JSON.parse(`{{data.calculated_data.graphs_data.periodograms_without_signal_frequency.parzen_periodogram|safe}}`.replace(/'/g, '"'));
+  const freq_bohman_periodogram = JSON.parse(`{{data.calculated_data.graphs_data.periodograms_without_signal_frequency.bohman_periodogram|safe}}`.replace(/'/g, '"'));
+  const freq_blackmanharris_periodogram = JSON.parse(`{{data.calculated_data.graphs_data.periodograms_without_signal_frequency.blackmanharris_periodogram|safe}}`.replace(/'/g, '"'));
+  const freq_nuttall_periodogram = JSON.parse(`{{data.calculated_data.graphs_data.periodograms_without_signal_frequency.nuttall_periodogram|safe}}`.replace(/'/g, '"'));
+  const freq_barthann_periodogram = JSON.parse(`{{data.calculated_data.graphs_data.periodograms_without_signal_frequency.barthann_periodogram|safe}}`.replace(/'/g, '"'));
+  const freq_cosine_periodogram = JSON.parse(`{{data.calculated_data.graphs_data.periodograms_without_signal_frequency.cosine_periodogram|safe}}`.replace(/'/g, '"'));
+  const freq_exponential_periodogram = JSON.parse(`{{data.calculated_data.graphs_data.periodograms_without_signal_frequency.exponential_periodogram|safe}}`.replace(/'/g, '"'));
+
+  const freq_tukey_periodogram = JSON.parse(`{{data.calculated_data.graphs_data.periodograms_without_signal_frequency.tukey_periodogram|safe}}`.replace(/'/g, '"'));
+  const freq_taylor_periodogram = JSON.parse(`{{data.calculated_data.graphs_data.periodograms_without_signal_frequency.taylor_periodogram|safe}}`.replace(/'/g, '"'));
+
+
+  const freq_periodogram_data = {
+    labels: freq_periodogram_without_signal_periodogram['freq'],
+    datasets: [{
+      label: 'Віконна функція',
+      backgroundColor: 'rgb(255, 99, 132)',
+      borderColor: 'rgb(255, 99, 132)',
+      data: freq_periodogram_without_signal_periodogram['response'],
+    }
+    ]
+  };
+
+  const freq_periodogram_matcher = {
+    "list-periodograma-list": freq_periodogram_without_signal_periodogram,
+    "list-triangle-list": freq_triangle_periodogram,
+    "list-hann-list": freq_hann_periodogram, 
+    "list-blackman-list": freq_blackman_periodogram,
+    "list-hamming-list": freq_hamming_periodogram,
+    "list-bartlett-list": freq_bartlett_periodogram,
+    "list-flattop-list": freq_flattop_periodogram,
+    "list-parzen-list": freq_parzen_periodogram,
+    "list-bohman-list": freq_bohman_periodogram,
+    "list-blackmanharris-list": freq_blackmanharris_periodogram,
+    "list-nuttall-list": freq_nuttall_periodogram,
+    "list-barthann-list": freq_barthann_periodogram,
+    "list-cosine-list": freq_cosine_periodogram,
+    "list-exponential-list": freq_exponential_periodogram,
+    "list-tukey-list": freq_tukey_periodogram,
+    "list-taylor-list": freq_taylor_periodogram,
+  }
+
+
+  const freq_periodogram_config = {
+    type: 'line',
+    data: freq_periodogram_data,
+    options: {
+      responsive: true,
+      plugins: {
+        title: {
+          display: true
+        }
+      },
+      scales: {
+        x: {
+          display: true,
+          title: {
+            display: true,
+            text: 'Частота Гц',
+            font: {
+              size: 24,
+            }
+          },
+          ticks: {
+            autoSkip: true,
+            maxTicksLimit: 20,
+            callback: (value, index, ticks) => parseInt(value)
+          }
+        },
+        y: {
+          ticks: {
+            callback: function (value) {
+                return numeral(value).format('0,0e+0')
+            }
+        },
+          display: true,
+          type: 'logarithmic',
+          title: {
+            display: true,
+            text: 'Амплітуда',
+            font: {
+              size: 24,
+            }
+          }
+       
+        }
+    }
+  }
+  };
+
+  const __config = {
+    type: 'line',
+    data: freq_periodogram_data,
+    
+    options: {
+      scales: {
+        x: {
+          display: true,
+          title: {
+            display: true,
+            text: `Частота (Гц)`,
+            font: {
+              size: 12,
+            }
+          },
+          ticks: {
+            autoSkip: true,
+            maxTicksLimit: 10,
+            callback: (value, index, ticks) => parseInt(value)
+          }
+        },
+        y: {
+          display: true,
+          title: {
+            display: true,
+            text: `Aмплітуда (дб)`,
+            font: {
+              size: 12,
+            }
+          },
+        }
+    }
+    }
+  };
+
+  const onlyFrequencyPeriodogramaGraph = new Chart(
+    document.getElementById('only-periodograma-frequency-graph'),
+    __config
+  );
+
+  
+
+  
+
   $( ".freq-graph" ).click((e, t) => {
     $(".freq-graph").removeClass("active");
     const target_id = e.target.id;
@@ -505,6 +646,12 @@
       $("#periodograma_div").removeClass("d-none");
       onlyPeriodogramaGraph.data.datasets[0].data = periodogram_matcher[target_id];
       onlyPeriodogramaGraph.update()
+
+      freq_graph_data = freq_periodogram_matcher[target_id];
+      console.log(freq_graph_data)
+      onlyFrequencyPeriodogramaGraph.data.labels = freq_graph_data['freq'];
+      onlyFrequencyPeriodogramaGraph.data.datasets[0].data = freq_graph_data['response'];
+      onlyFrequencyPeriodogramaGraph.update()
     }
   }); 
 

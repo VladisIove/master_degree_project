@@ -1,11 +1,11 @@
 
-from decimal import Decimal
+from utils.custom_range import crange
 import numpy as np
 from pandas import DataFrame
 from utils.base_forms import AnalyticBaseForm 
 
 from utils.parser_files import convertor_file_to_df
-from django.forms import FileField, FloatField, IntegerField, ChoiceField
+from django.forms import FileField, FloatField, IntegerField, ChoiceField, BooleanField
 
 from utils.base_validators import validate_file_extension
 
@@ -61,11 +61,12 @@ class CustomAnalyitcForm(AnalyticBaseForm):
     type_of_signal = ChoiceField(required=False, choices=SIGNAL_TYPE)
     mean = FloatField(label='Середне значення', required=True)
     scope = FloatField(label='Розмах', required=True)
-    # count_of_dots = IntegerField(label='Кількість точок', required=True)
-    frequency_sampling = FloatField(label='Частота дискретизації', required=True)
-    period_sampling = FloatField(label='Період дискретизації', required=True)
-    frequency = IntegerField(label='Частота', required=True)
+    checker_count_of_dot_or_period_sampling = BooleanField(label='Обраховувати через кількість періодів')
     count_of_periods = IntegerField(label='Кількість періодів', required=True)
+    count_of_dots = IntegerField(label='Кількість точок', required=True)
+    period_sampling = FloatField(label='Період дискретизації', required=True)
+    frequency_sampling = FloatField(label='Частота дискретизації', required=True)
+    frequency = IntegerField(label='Частота', required=True)
     
     def calculation_data(self, df: DataFrame) -> dict:
         analytics_data = self._determination_data(df)
@@ -85,7 +86,7 @@ class CustomAnalyitcForm(AnalyticBaseForm):
         p = self.cleaned_data['count_of_periods']
         
         T = 1/f
-        t = np.arange(0,p*T-Td,Td)
+        t = crange(Td,p*T,Td)
         z = 2*np.pi*t*f
         zz = rozmah*getattr(np, type_of_signal)(z)
         y = float(mean)+ zz

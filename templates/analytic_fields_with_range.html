@@ -93,6 +93,7 @@
                 time_reloud && Date.now() - time_reloud > 1500
             ){
                 $("#butt").click();
+                clearInterval(timerId);
             }
         }, 
     750);
@@ -152,10 +153,10 @@
             $('#id_frequency_sampling').val(fd);
         }
         $("#id_period_sampling").val(1/fd);
-        $("#id_frequency").val(parseInt(fd/2));
+        $("#id_frequency").val(parseInt(fd/255));
         freq_range_updater(fd);
         period_range_updater(1/fd);
-        f_range_updater(parseInt(fd/2));
+        f_range_updater(parseInt(fd/255));
         time_reloud = Date.now();
       });
     
@@ -166,10 +167,10 @@
             $('#id_period_sampling').val(td);
         }
         $("#id_frequency_sampling").val(1/td);
-        $("#id_frequency").val(parseInt((1/td)/2));
+        $("#id_frequency").val(parseInt((1/td)/25));
         freq_range_updater(1/td);
         period_range_updater(td);
-        f_range_updater(parseInt((1/td)/2));
+        f_range_updater(parseInt((1/td)/25));
         time_reloud = Date.now();
       });
 
@@ -180,13 +181,11 @@
             $('#id_frequency').val(f);
         }
         var fd = $('#id_frequency_sampling').val();
-        if(f*2 > fd){
-            console.log(fd, f)
-            $("#id_frequency_sampling").val(f*2);
-            freq_range_updater(f*2);
-            period_range_updater(1/(f*2));
-            $("#id_period_sampling").val(1/(f*2));
-        }
+        $("#id_frequency_sampling").val(f*25);
+        freq_range_updater(f*25);
+        period_range_updater(1/(f*25));
+        $("#id_period_sampling").val(1/(f*25));
+
 
         f_range_updater(f);
         time_reloud = Date.now();
@@ -232,10 +231,10 @@
         onChange: function(data) {
             $("#id_frequency_sampling").val(data.from);
             $("#id_period_sampling").val(1/data.from);
-            $("#id_frequency").val(parseInt(data.from/2));
+            $("#id_frequency").val(parseInt(data.from/25));
 
             period_range_updater(1/data.from);
-            f_range_updater(parseInt(data.from/2));
+            f_range_updater(parseInt(data.from/25));
             time_reloud = Date.now();
         }
       }); 
@@ -252,10 +251,10 @@
         onChange: function(data) {
             $("#id_period_sampling").val(data.from);
             $("#id_frequency_sampling").val(1/data.from);
-            $("#id_frequency").val(parseInt((1/data.from)/2));
+            $("#id_frequency").val(parseInt((1/data.from)/25));
 
             freq_range_updater(1/data.from);
-            f_range_updater(parseInt((1/data.from)/2));
+            f_range_updater(parseInt((1/data.from)/25));
             time_reloud = Date.now();
         }
       }); 
@@ -266,17 +265,15 @@
         type: "single",
         from: `{{form.frequency.value}}`,
         min: 0,
-        max: 200,
+        max: 400,
         onChange: function(data) {
             $("#id_frequency").val(data.from);
 
             var fd = $('#id_frequency_sampling').val();
-            if(data.from*2 > fd){
-                $("#id_frequency_sampling").val(data.from*2);
-                freq_range_updater(data.from*2);
-                period_range_updater(1/(data.from*2));
-                $("#id_period_sampling").val(1/(data.from*2));
-            }
+            $("#id_frequency_sampling").val(data.from*25);
+            freq_range_updater(data.from*25);
+            period_range_updater(1/(data.from*25));
+            $("#id_period_sampling").val(1/(data.from*25));
             time_reloud = Date.now();
         }
       }); 

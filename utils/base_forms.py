@@ -24,6 +24,7 @@ class AnalyticBaseForm(Form):
         
         fft_data = self._get_fft_data(df)
         periodograms_without_signal = self._get_periodograms_without_signal(df)
+        periodograms_without_signal_frequency = self._get_periodograms_without_signal_frequency(periodograms_without_signal)
         return {
             'period_descritiatcii': period_descritiatcii,
             'kilkist_vidlikiv': kilkist_vidlikiv,
@@ -48,7 +49,8 @@ class AnalyticBaseForm(Form):
             'tukey_periodogram': self._get_tukey_periodogram_data(df),
             'taylor_periodogram': self._get_taylor_periodogram_data(df),
             
-            'periodograms_without_signal': periodograms_without_signal
+            'periodograms_without_signal': periodograms_without_signal,
+            'periodograms_without_signal_frequency': periodograms_without_signal_frequency,
         }
         
     def _stochastic_data(self, df: DataFrame) -> dict:
@@ -175,7 +177,7 @@ class AnalyticBaseForm(Form):
         y = df[Y_header_name].to_list()
         fd = self._get_chastota_descritiatcii(df)
         N = len(y)
-        yf = fftshift(np.abs(fft(y)/N))
+        yf = fftshift(np.abs(fft(y)))/N
         start = -fd/2
         end = fd/2
         step = fd/N
@@ -262,53 +264,128 @@ class AnalyticBaseForm(Form):
             'taylor_periodogram': list(taylor(N)),
         }
     
-    def _get_periodogram_boxcar_without_signal(self, N: int) -> dict:
-        window = boxcar(N)
-        A = fft(window, 2048) / (len(window)/2.0)
-        freq = np.linspace(-0.5, 0.5, len(A))
-        response = 20 * np.log10(np.abs(fftshift(A / abs(A).max())))
+    def _get_periodograms_without_signal_frequency(self, periodograms_without_signal: dict) -> dict: 
+        
         return {
-            'window': window, 
-            'freq': freq,
-            'response': response
+            'periodogram': self._get_periodogram_boxcar_without_signal(periodograms_without_signal['periodogram']),
+            'triangle_periodogram': self._get_periodogram_triangl_without_signal(periodograms_without_signal['triangle_periodogram']),
+            'hann_periodogram': self._get_periodogram_hann_without_signal(periodograms_without_signal['hann_periodogram']),
+            'blackman_periodogram': self._get_periodogram_blackman_without_signal(periodograms_without_signal['blackman_periodogram']),
+            'hamming_periodogram': self._get_periodogram_hamming_without_signal(periodograms_without_signal['hamming_periodogram']),
+            'bartlett_periodogram': self._get_periodogram_bartlett_without_signal(periodograms_without_signal['bartlett_periodogram']),
+            'flattop_periodogram': self._get_periodogram_flattop_without_signal(periodograms_without_signal['flattop_periodogram']),
+            'parzen_periodogram': self._get_periodogram_parzen_without_signal(periodograms_without_signal['parzen_periodogram']),
+            'bohman_periodogram': self._get_periodogram_bohman_without_signal(periodograms_without_signal['bohman_periodogram']),
+            'blackmanharris_periodogram': self._get_periodogram_blackmanharris_without_signal(periodograms_without_signal['blackmanharris_periodogram']),
+            'nuttall_periodogram': self._get_periodogram_blackmanharris_without_signal(periodograms_without_signal['nuttall_periodogram']),
+            'barthann_periodogram': self._get_periodogram_blackmanharris_without_signal(periodograms_without_signal['barthann_periodogram']),
+            'cosine_periodogram': self._get_periodogram_blackmanharris_without_signal(periodograms_without_signal['cosine_periodogram']),
+            'exponential_periodogram': self._get_periodogram_blackmanharris_without_signal(periodograms_without_signal['exponential_periodogram']),
+            'tukey_periodogram': self._get_periodogram_blackmanharris_without_signal(periodograms_without_signal['tukey_periodogram']),
+            'taylor_periodogram': self._get_periodogram_blackmanharris_without_signal(periodograms_without_signal['taylor_periodogram']),
+        }
+        
+
+    def _get_periodogram_boxcar_without_signal(self, window: np.arange) -> dict:
+        A = fft(window, 512) / (len(window)/2.0)
+        freq = np.linspace(-0.5, 0.5, len(A))
+        response = np.abs(fftshift(A / abs(A).max()))
+        response = 20 * np.log10(np.maximum(response, 1e-10))
+        print(response)
+        return {
+            'freq': list(freq),
+            'response': list(response)
         }
     
-    def _get_periodogram_triangl_without_signal(self, N: int) -> dict:
-        window = triang(N)
-        A = fft(window, 2048) / (len(window)/2.0)
+    def _get_periodogram_triangl_without_signal(self, window: np.arange) -> dict:
+        A = fft(window, 512) / (len(window)/2.0)
         freq = np.linspace(-0.5, 0.5, len(A))
         response = np.abs(fftshift(A / abs(A).max()))
         response = 20 * np.log10(np.maximum(response, 1e-10))
         return {
-            'window': window, 
-            'freq': freq,
-            'response': response
+            'freq': list(freq),
+            'response': list(response)
         }
     
-    def _get_periodogram_hann_without_signal(self, N:int) -> dict:
-        window = hann(N)
-        A = fft(window, 2048) / (len(window)/2.0)
+    def _get_periodogram_hann_without_signal(self, window: np.arange) -> dict:
+        A = fft(window, 512) / (len(window)/2.0)
         freq = np.linspace(-0.5, 0.5, len(A))
         response = np.abs(fftshift(A / abs(A).max()))
         response = 20 * np.log10(np.maximum(response, 1e-10))
         return {
-            'window': window, 
-            'freq': freq,
-            'response': response
+            'freq': list(freq),
+            'response': list(response)
         }
     
-    # def _get_periodogram_blackman_without_signal(self, N: int) -> dict:
-    #     window = blackman(N)
-    #     A = fft(window, 2048) / (len(window)/2.0)
-    #     freq = np.linspace(-0.5, 0.5, len(A))
-    #     response = np.abs(fftshift(A / abs(A).max()))
-    #     response = 20 * np.log10(np.maximum(response, 1e-10))
-    #     return {
-    #         'window': window, 
-    #         'freq': freq,
-    #         'response': response
-    #     }
+    def _get_periodogram_blackman_without_signal(self, window: np.arange) -> dict:
+        A = fft(window, 512) / (len(window)/2.0)
+        freq = np.linspace(-0.5, 0.5, len(A))
+        response = np.abs(fftshift(A / abs(A).max()))
+        response = 20 * np.log10(np.maximum(response, 1e-10))
+        return {
+            'freq': list(freq),
+            'response': list(response)
+        }
     
+    def _get_periodogram_hamming_without_signal(self, window: np.arange) -> dict:
+        A = fft(window, 512) / (len(window)/2.0)
+        freq = np.linspace(-0.5, 0.5, len(A))
+        response = np.abs(fftshift(A / abs(A).max()))
+        response = 20 * np.log10(np.maximum(response, 1e-10))
+        return {
+            'freq': list(freq),
+            'response': list(response)
+        }
+        
+    def _get_periodogram_bartlett_without_signal(self, window: np.arange) -> dict:
+        A = fft(window, 512) / (len(window)/2.0)
+        freq = np.linspace(-0.5, 0.5, len(A))
+        response = np.abs(fftshift(A / abs(A).max()))
+        response = 20 * np.log10(np.maximum(response, 1e-10))
+        return {
+            'freq': list(freq),
+            'response': list(response)
+        }
+    
+    def _get_periodogram_flattop_without_signal(self, window: np.arange) -> dict:
+        A = fft(window, 512) / (len(window)/2.0)
+        freq = np.linspace(-0.5, 0.5, len(A))
+        response = np.abs(fftshift(A / abs(A).max()))
+        response = 20 * np.log10(np.maximum(response, 1e-10))
+        return {
+            'freq': list(freq),
+            'response': list(response)
+        }
+    
+    def _get_periodogram_parzen_without_signal(self, window: np.arange) -> dict:
+        A = fft(window, 512) / (len(window)/2.0)
+        freq = np.linspace(-0.5, 0.5, len(A))
+        response = np.abs(fftshift(A / abs(A).max()))
+        response = 20 * np.log10(np.maximum(response, 1e-10))
+        return {
+            'freq': list(freq),
+            'response': list(response)
+        }
+    
+    def _get_periodogram_bohman_without_signal(self, window: np.arange) -> dict:
+        A = fft(window, 512) / (len(window)/2.0)
+        freq = np.linspace(-0.5, 0.5, len(A))   
+        response = np.abs(fftshift(A / abs(A).max()))
+        response = 20 * np.log10(np.maximum(response, 1e-10))
+        return {
+            'freq': list(freq),
+            'response': list(response)
+        }
+    
+    def _get_periodogram_blackmanharris_without_signal(self, window: np.arange) -> dict:
+        A = fft(window, 512) / (len(window)/2.0)
+        freq = np.linspace(-0.5, 0.5, len(A))   
+        response = np.abs(fftshift(A / abs(A).max()))
+        response = 20 * np.log10(np.maximum(response, 1e-10))
+        return {
+            'freq': list(freq),
+            'response': list(response)
+        }
     
 
 class DownloadAnalyticFilesForm(Form):
