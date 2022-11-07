@@ -26,13 +26,30 @@
     </div>
 </div>
 
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="{{form.checker_count_of_dot_or_period_sampling.name}}"  id="{{ form.checker_count_of_dot_or_period_sampling.auto_id }}" {% if form.checker_count_of_dot_or_period_sampling.value %} checked {% endif %}>
+        <label class="form-check-label" for="{{ form.checker_count_of_dot_or_period_sampling.auto_id }}" >
+            {{form.checker_count_of_dot_or_period_sampling.label}}           
+        </label>
+    </div>
+
 <div class="form-group row">
     <label class="col-sm-4 col-form-label" for="{{ form.count_of_periods.auto_id }}">{{ form.count_of_periods.label }}</label>
     <div class="col-sm-8">
-        <input type="number" min=2 name="{{form.count_of_periods.name}}" value="{{form.count_of_periods.value}}" step="any" class="numberinput form-control" required="" id="{{form.count_of_periods.auto_id}}">
+        <input type="number" min=2 name="{{form.count_of_periods.name}}" value="{{form.count_of_periods.value}}" step="any" class="numberinput form-control" required=""  {% if not form.checker_count_of_dot_or_period_sampling.value %} readonly {% endif %} id="{{form.count_of_periods.auto_id}}">
     </div>
     <div class="col-sm-12">
         <input type="range" value="{{form.count_of_periods.value}}" class="slider" id="count_of_periods_range">
+    </div>
+</div>
+
+<div class="form-group row">
+    <label class="col-sm-4 col-form-label" for="{{ form.count_of_dots.auto_id }}">{{ form.count_of_dots.label }}</label>
+    <div class="col-sm-8">
+        <input type="number" min=2 name="{{form.count_of_dots.name}}" value="{{form.count_of_dots.value}}" step="any" class="numberinput form-control"  {% if form.checker_count_of_dot_or_period_sampling.value %} readonly {% endif %} required="" id="{{form.count_of_dots.auto_id}}">
+    </div>
+    <div class="col-sm-12">
+        <input type="range" value="{{form.count_of_dots.value}}" class="slider" id="count_of_dots_range">
     </div>
 </div>
 
@@ -92,6 +109,7 @@
             if(
                 time_reloud && Date.now() - time_reloud > 1500
             ){
+
                 $("#butt").click();
                 clearInterval(timerId);
             }
@@ -191,13 +209,65 @@
         time_reloud = Date.now();
       });
       
-      $( "#count_of_periods" ).on('input', (e) =>  {
-        var N = $('#count_of_periods').val();
+      $( "#id_count_of_periods" ).on('input', (e) =>  {
+        var N = $('#id_count_of_periods').val();
         var slider = $("#count_of_periods_range").data("ionRangeSlider");
         
         if(N < 1){
             N = 1;
-            $('#count_of_periods').val(N);
+            $('#id_count_of_periods').val(N);
+        }
+
+        update_data = {
+            from: N,
+        }
+        slider.update(update_data);
+        time_reloud = Date.now();
+      });
+
+    $("#id_checker_count_of_dot_or_period_sampling").click( (e) => {
+        if($("#id_checker_count_of_dot_or_period_sampling").is(':checked')){
+            $( "#id_count_of_dots" ).prop( "readonly", true );
+            var slider = $("#count_of_dots_range").data("ionRangeSlider");
+            update_data = {
+                to_fixed:true,
+                from_fixed:true,
+            }
+            slider.update(update_data)
+            $( "#id_count_of_periods" ).prop( "readonly", false );
+            var slider = $("#count_of_periods_range").data("ionRangeSlider");
+            update_data = {
+                to_fixed:false,
+                from_fixed:false,
+            }
+            slider.update(update_data)
+
+        }else{
+            $( "#id_count_of_periods" ).prop( "readonly", true );
+            var slider = $("#count_of_periods_range").data("ionRangeSlider");
+            update_data = {
+                to_fixed:true,
+                from_fixed:true,
+            }
+            slider.update(update_data)
+
+            $( "#id_count_of_dots" ).prop( "readonly", false );
+            var slider = $("#count_of_dots_range").data("ionRangeSlider");
+            update_data = {
+                to_fixed:false,
+                from_fixed:false,
+            }
+            slider.update(update_data)
+        }
+    } )
+
+      $( "#id_count_of_dots" ).on('input', (e) =>  {
+        var N = $('#id_count_of_dots').val();
+        var slider = $("#count_of_dots_range").data("ionRangeSlider");
+        
+        if(N < 1){
+            N = 1;
+            $('#id_count_of_dots').val(N);
         }
 
         update_data = {
@@ -215,11 +285,38 @@
         from: `{{form.count_of_periods.value}}`,
         min: 2,
         max: 200,
+        {% if not form.checker_count_of_dot_or_period_sampling.value %}
+        to_fixed:true,
+        from_fixed:true,
+        {% endif %}
         onChange: function(data) {
+            if($("#id_checker_count_of_dot_or_period_sampling").is(':checked')){
             $("#id_count_of_periods").val(data.from);
             time_reloud = Date.now();
+            }
         }
-      }); 
+      });
+
+      $("#count_of_dots_range").ionRangeSlider({
+        grid: true,
+        skin: "big",
+        type: "single",
+        from: `{{form.count_of_dots.value}}`,
+        min: 2,
+        max: 2048*50,
+        {% if form.checker_count_of_dot_or_period_sampling.value %}
+        to_fixed:true,
+        from_fixed:true,
+        {% endif %}
+        onChange: function(data) {
+            if(!$("#id_checker_count_of_dot_or_period_sampling").is(':checked')){
+            $("#id_count_of_dots").val(data.from);
+            time_reloud = Date.now();
+            }
+        }
+      });
+      
+      
 
       $("#frequency_sampling_range").ionRangeSlider({
         grid: true,

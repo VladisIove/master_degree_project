@@ -58,12 +58,13 @@ class CustomAnalyitcForm(AnalyticBaseForm):
         (SignalType.SIN, 'sin')
     ) 
     
+    
     type_of_signal = ChoiceField(required=False, choices=SIGNAL_TYPE)
     mean = FloatField(label='Середне значення', required=True)
     scope = FloatField(label='Розмах', required=True)
-    checker_count_of_dot_or_period_sampling = BooleanField(label='Обраховувати через кількість періодів')
-    count_of_periods = IntegerField(label='Кількість періодів', required=True)
-    count_of_dots = IntegerField(label='Кількість точок', required=True)
+    checker_count_of_dot_or_period_sampling = BooleanField(label='Обраховувати через кількість періодів', required=False)
+    count_of_periods = IntegerField(label='Кількість періодів', required=False)
+    count_of_dots = IntegerField(label='Кількість точок', required=False) 
     period_sampling = FloatField(label='Період дискретизації', required=True)
     frequency_sampling = FloatField(label='Частота дискретизації', required=True)
     frequency = IntegerField(label='Частота', required=True)
@@ -84,9 +85,14 @@ class CustomAnalyitcForm(AnalyticBaseForm):
         rozmah = self.cleaned_data['scope']
         mean = self.cleaned_data['mean']
         p = self.cleaned_data['count_of_periods']
-        
+        count_of_dots = self.cleaned_data['count_of_dots']
+        checker_count_of_dot_or_period_sampling = self.cleaned_data['checker_count_of_dot_or_period_sampling']
         T = 1/f
-        t = crange(Td,p*T,Td)
+        
+        if checker_count_of_dot_or_period_sampling:
+            t = crange(Td,p*T,Td)
+        else:
+            t = np.linspace(Td, count_of_dots*Td, count_of_dots)
         z = 2*np.pi*t*f
         zz = rozmah*getattr(np, type_of_signal)(z)
         y = float(mean)+ zz

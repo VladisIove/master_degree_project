@@ -16,7 +16,7 @@ class TimeAnalysisView(ExportFileViewMixin, FormView):
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         context_data = super().get_context_data(**kwargs)
         if kwargs:
-            context_data['export_file_form'] = DownloadAnalyticFilesForm # (data={'context_data_field': kwargs.get('data', {}).get('calculated_data_json'), 'file_type': DownloadAnalyticFilesForm.FileType.TXT})
+            context_data['export_file_form'] = DownloadAnalyticFilesForm(data={'context_data_field': kwargs.get('data', {}).get('calculated_data_json'), 'file_type': DownloadAnalyticFilesForm.FileType.TXT})
         else: 
             context_data['export_file_form'] = DownloadAnalyticFilesForm
         return context_data
@@ -49,10 +49,12 @@ class CustomAnalyticView(ExportFileViewMixin, FormView):
                     type_of_signal = self.form_class.SignalType.SIN,
                     mean = 3,
                     scope = 1,
-                    count_of_periods = 6,
-                    frequency_sampling = 1706.67,
-                    period_sampling = 0.000585936355,
-                    frequency = 20
+                    count_of_periods = 2,
+                    frequency_sampling = 500,
+                    period_sampling = 0.002,
+                    frequency = 99,
+                    count_of_dots=22,
+                    checker_count_of_dot_or_period_sampling=True
                     )
             )
         }
