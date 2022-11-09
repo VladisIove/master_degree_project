@@ -114,7 +114,7 @@
                 clearInterval(timerId);
             }
         }, 
-    750);
+    350);
 
     const freq_range_updater = (N) => {
         var slider = $("#frequency_sampling_range").data("ionRangeSlider");
@@ -303,7 +303,7 @@
         type: "single",
         from: `{{form.count_of_dots.value}}`,
         min: 2,
-        max: 2048*50,
+        max: 32768,
         {% if form.checker_count_of_dot_or_period_sampling.value %}
         to_fixed:true,
         from_fixed:true,

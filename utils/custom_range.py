@@ -1,6 +1,6 @@
 import numpy as np
 
-def cust_range(*args, rtol=1e-05, atol=1e-08, include=[True, False]):
+def cust_range(*args, rtol=1e-10, atol=1e-10, include=[True, False]):
     """
     Combines numpy.arange and numpy.isclose to mimic
     open, half-open and closed intervals.

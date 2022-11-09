@@ -1,4 +1,6 @@
+from functools import cached_property
 import math
+from utils.custom_range import crange
 import numpy as np
 
 from pandas import DataFrame
@@ -79,7 +81,7 @@ class AnalyticBaseForm(Form):
     
     @staticmethod
     def _get_min(df: DataFrame) -> dict:
-        min = df.min()
+        min = df.min().round(3)
         return {
             'label': 'Мінімальне значення',
             'value': min.to_dict()
@@ -87,7 +89,7 @@ class AnalyticBaseForm(Form):
         
     @staticmethod
     def _get_max(df: DataFrame) -> dict:
-        max = df.max()
+        max = df.max().round(3)
         return {
             'label': 'Максимальне значення',
             'value': max.to_dict()
@@ -95,7 +97,7 @@ class AnalyticBaseForm(Form):
         
     @staticmethod
     def _get_median(df: DataFrame) -> dict:
-        median = df.median()
+        median = df.median().round(3)
         return {
             'label': 'Медіана значення',
             'value': median.to_dict()
@@ -104,9 +106,12 @@ class AnalyticBaseForm(Form):
     @staticmethod
     def _get_mean(df: DataFrame) -> dict:
         mean = df.mean()
+        _mean =mean.to_dict()
+        k0 = list(_mean.keys())[0]
+        k1 = list(_mean.keys())[1]
         return {
             'label': 'Cередне значення',
-            'value': mean.to_dict()
+            'value': {k0: '-',  k1: round(_mean[k1], 3)}
         }
         
     @staticmethod
@@ -117,34 +122,39 @@ class AnalyticBaseForm(Form):
         
         return {
             'label': 'Розмах',
-            'value': {headers[0]:x_rozmah, headers[1]: y_rozmah} 
+            'value': {headers[0]:'-', headers[1]: round(y_rozmah, 3)} 
         }
         
     @staticmethod
     def _get_dispersion(df: DataFrame) -> dict:
         dispersion = df.var()
+        _dispersion = dispersion.to_dict()
+        k0 = list(_dispersion.keys())[0]
+        k1 = list(_dispersion.keys())[1]
         return {
             'label': 'Дисперсія',
-            'value': dispersion.to_dict()
+            'value': {k0: '-',  k1: round(_dispersion[k1], 3)}
         }
         
     @staticmethod
     def _get_std(df: DataFrame) -> dict:
         std = df.std()
+        _std = std.to_dict()
+        k0 = list(_std.keys())[0]
+        k1 = list(_std.keys())[1]
         return {
             'label': 'Середньоквадратичне відхилення',
-            'value': std.to_dict()
+            'value': {k0: '-',  k1: round(_std[k1], 3)}
         }
     
     @staticmethod
     def _get_mathematical_expectation(df: DataFrame) -> dict:
         headers = df.columns.tolist()
-        val1 = (df[headers[0]] * df[headers[1]]).sum() / df[headers[1]].sum()
         val2 = (df[headers[1]] * df[headers[0]]).sum() / df[headers[0]].sum()
         
         return {
             'label': 'Математичне сподівання',
-            'value': {headers[0]:val1, headers[1]: val2}  
+            'value': {headers[0]:'-', headers[1]: round(val2, 3)}  
         }
         
     @staticmethod
@@ -160,7 +170,7 @@ class AnalyticBaseForm(Form):
         return len(df[X_header_name].to_list())
     
     def _get_chastota_descritiatcii(self, df: DataFrame) -> float:
-        return 1 / self._get_period_descritiatcii(df) 
+        return 1 / self._get_period_descritiatcii(df)
 
     @staticmethod
     def _get_period_descritiatcii(df: DataFrame) -> float:
@@ -291,7 +301,6 @@ class AnalyticBaseForm(Form):
         freq = np.linspace(-0.5, 0.5, len(A))
         response = np.abs(fftshift(A / abs(A).max()))
         response = 20 * np.log10(np.maximum(response, 1e-10))
-        print(response)
         return {
             'freq': list(freq),
             'response': list(response)
@@ -382,6 +391,8 @@ class AnalyticBaseForm(Form):
         freq = np.linspace(-0.5, 0.5, len(A))   
         response = np.abs(fftshift(A / abs(A).max()))
         response = 20 * np.log10(np.maximum(response, 1e-10))
+        freq[np.isnan(freq)] = 0
+        response[np.isnan(response)] = 0
         return {
             'freq': list(freq),
             'response': list(response)

@@ -36,16 +36,17 @@
                         <tr>
                             <th scope="row">{{values.label}}</th>
                             {% for k, v in values.value.items %}
-                            <td>{{v|floatformat:3}}</td>
+                            
+                            <td class="text-center">{{v}}</td>
                             {% endfor %}
                         </tr>
                         {% endfor %}
                         <tr>
-                            <th scope="row">Період дескрітизації</th>
+                            <th scope="row">Період дискретизація</th>
                             <td colspan="2"> {{ data.calculated_data.graphs_data.period_descritiatcii|floatformat:5 }} (с) </td>
                         </tr>
                         <tr>
-                            <th scope="row">Частота дескрітизації</th>
+                            <th scope="row">Частота дискретизація</th>
                             <td colspan="2"> {{ data.calculated_data.graphs_data.chastota_descritiatcii|floatformat:2 }} (Гц) </td>
                         </tr>
                         <tr>

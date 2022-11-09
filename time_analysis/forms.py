@@ -79,7 +79,9 @@ class CustomAnalyitcForm(AnalyticBaseForm):
         
     def get_dataframe(self) -> DataFrame:
         f = self.cleaned_data['frequency']
-        Td = self.cleaned_data['period_sampling']
+        T=1/f
+        fd=25*f
+        Td=1/fd
         
         type_of_signal = self.cleaned_data['type_of_signal']
         rozmah = self.cleaned_data['scope']
@@ -87,14 +89,13 @@ class CustomAnalyitcForm(AnalyticBaseForm):
         p = self.cleaned_data['count_of_periods']
         count_of_dots = self.cleaned_data['count_of_dots']
         checker_count_of_dot_or_period_sampling = self.cleaned_data['checker_count_of_dot_or_period_sampling']
-        T = 1/f
         
         if checker_count_of_dot_or_period_sampling:
             t = crange(Td,p*T,Td)
         else:
             t = np.linspace(Td, count_of_dots*Td, count_of_dots)
         z = 2*np.pi*t*f
-        zz = rozmah*getattr(np, type_of_signal)(z)
+        zz = rozmah/2*getattr(np, type_of_signal)(z)
         y = float(mean)+ zz
         
         return DataFrame({'t': t.tolist(), 'y': y.tolist()})

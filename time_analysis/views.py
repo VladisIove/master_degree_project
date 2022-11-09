@@ -1,4 +1,7 @@
+from functools import wraps
 import json
+import sys
+from time import time
 from typing import Any, Dict
 from utils.mixins import ExportFileViewMixin
 from utils.base_forms import DownloadAnalyticFilesForm
@@ -15,11 +18,14 @@ class TimeAnalysisView(ExportFileViewMixin, FormView):
     
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         context_data = super().get_context_data(**kwargs)
+        # with open('results.json', 'w') as f:
+        #     json.dump(kwargs['data'], f)
         if kwargs:
             context_data['export_file_form'] = DownloadAnalyticFilesForm(data={'context_data_field': kwargs.get('data', {}).get('calculated_data_json'), 'file_type': DownloadAnalyticFilesForm.FileType.TXT})
         else: 
             context_data['export_file_form'] = DownloadAnalyticFilesForm
         return context_data
+    
     
     def form_valid(self, form):
         income_dataframe: DataFrame = form.get_dataframe_from_file()
@@ -48,7 +54,7 @@ class CustomAnalyticView(ExportFileViewMixin, FormView):
                     data = dict(
                     type_of_signal = self.form_class.SignalType.SIN,
                     mean = 3,
-                    scope = 1,
+                    scope = 4,
                     count_of_periods = 2,
                     frequency_sampling = 500,
                     period_sampling = 0.002,
