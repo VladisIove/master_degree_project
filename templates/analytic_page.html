@@ -11,7 +11,7 @@
         <div class="row m-0 p-0 col-md-3 col-12">
             <div class="border p-5 col-12"> 
                 {% block form %}
-                    <form method="post" enctype="multipart/form-data" action={% url request.resolver_match.url_name %}>
+                    <form method="post" id="data-form" enctype="multipart/form-data" action={% url request.resolver_match.url_name %}>
                         {% if request.resolver_match.url_name == "time-analysis" %}
                             {% include 'analytic_fields.html' with form=form button_name='Обробити дані' %}
                         {% else %}
@@ -36,22 +36,21 @@
                         <tr>
                             <th scope="row">{{values.label}}</th>
                             {% for k, v in values.value.items %}
-                            
-                            <td class="text-center">{{v}}</td>
+                                <td class="text-center" id="{{k}}">{{v}}</td>
                             {% endfor %}
                         </tr>
                         {% endfor %}
                         <tr>
                             <th scope="row">Період дискретизація</th>
-                            <td colspan="2"> {{ data.calculated_data.graphs_data.period_descritiatcii|floatformat:5 }} (с) </td>
+                            <td colspan="2" id="period_descritiatcii"> {{ data.calculated_data.graphs_data.period_descritiatcii|floatformat:5 }} (с) </td>
                         </tr>
                         <tr>
                             <th scope="row">Частота дискретизація</th>
-                            <td colspan="2"> {{ data.calculated_data.graphs_data.chastota_descritiatcii|floatformat:2 }} (Гц) </td>
+                            <td colspan="2" id="chastota_descritiatcii"> {{ data.calculated_data.graphs_data.chastota_descritiatcii|floatformat:2 }} (Гц) </td>
                         </tr>
                         <tr>
                             <th scope="row">Кількість відліків</th>
-                            <td colspan="2"> {{ data.calculated_data.graphs_data.kilkist_vidlikiv|floatformat:2 }} (б/р)</td>
+                            <td colspan="2" id="kilkist_vidlikiv"> {{ data.calculated_data.graphs_data.kilkist_vidlikiv|floatformat:2 }} (б/р)</td>
                         </tr>
                         </tbody>
                     </table>

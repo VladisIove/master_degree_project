@@ -3,6 +3,8 @@ import json
 import sys
 from time import time
 from typing import Any, Dict
+
+from django.http import JsonResponse
 from utils.mixins import ExportFileViewMixin
 from utils.base_forms import DownloadAnalyticFilesForm
 from django.views.generic.edit import FormView
@@ -18,7 +20,7 @@ class TimeAnalysisView(ExportFileViewMixin, FormView):
     
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         context_data = super().get_context_data(**kwargs)
-        # with open('results.json', 'w') as f:
+        # with open('result.json', 'w') as f:
         #     json.dump(kwargs['data'], f)
         if kwargs:
             context_data['export_file_form'] = DownloadAnalyticFilesForm(data={'context_data_field': kwargs.get('data', {}).get('calculated_data_json'), 'file_type': DownloadAnalyticFilesForm.FileType.TXT})
@@ -84,4 +86,4 @@ class CustomAnalyticView(ExportFileViewMixin, FormView):
         income_dataframe = income_dataframe.round(5)
         data['data_for_graph'] = income_dataframe.to_dict('list')
         context = self.get_context_data(data=data, form=form)
-        return self.render_to_response(context)
+        return JsonResponse(context['data'])

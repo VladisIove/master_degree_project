@@ -65,7 +65,7 @@ class AnalyticBaseForm(Form):
         data['dispersion'] = self._get_dispersion(df)
         data['std'] = self._get_std(df)
         data['mathematical_expectation'] = self._get_mathematical_expectation(df)
-        df = self._get_amplitude_modulation(df)
+        # df = self._get_amplitude_modulation(df)
         return data
      
     
@@ -76,75 +76,82 @@ class AnalyticBaseForm(Form):
         data['median'] = self._get_median(df)
         data['mean'] = self._get_mean(df)
         data['quantile'] = self._get_quantile(df)
-        df = self._get_amplitude_modulation(df)
+        # df = self._get_amplitude_modulation(df)
         return data
     
     @staticmethod
     def _get_min(df: DataFrame) -> dict:
         min = df.min().round(3)
+        _min = min.to_dict()
+        k0 = list(_min.keys())[0]
+        k1 = list(_min.keys())[1]
         return {
             'label': 'Мінімальне значення',
-            'value': min.to_dict()
+            'value':{'x_min': round(_min[k0], 3),  'y_min': round(_min[k1], 3)}
         } 
         
     @staticmethod
     def _get_max(df: DataFrame) -> dict:
         max = df.max().round(3)
+        _max = max.to_dict()
+        k0 = list(_max.keys())[0]
+        k1 = list(_max.keys())[1]
         return {
             'label': 'Максимальне значення',
-            'value': max.to_dict()
+            'value': {'x_max': round(_max[k0], 3),  'y_max': round(_max[k1], 3)}
         }
         
     @staticmethod
     def _get_median(df: DataFrame) -> dict:
         median = df.median().round(3)
+        _median = median.to_dict()
+        k1 = list(_median.keys())[1]
         return {
             'label': 'Медіана значення',
-            'value': median.to_dict()
+            'value': {'x_median': '-',  'y_median': round(_median[k1], 3)}
         } 
         
     @staticmethod
     def _get_mean(df: DataFrame) -> dict:
         mean = df.mean()
         _mean =mean.to_dict()
-        k0 = list(_mean.keys())[0]
         k1 = list(_mean.keys())[1]
         return {
             'label': 'Cередне значення',
-            'value': {k0: '-',  k1: round(_mean[k1], 3)}
+            'value': {'x_mean': '-',  'y_mean': round(_mean[k1], 3)}
         }
         
     @staticmethod
     def _get_quantile(df: DataFrame) -> dict:
         headers = df.columns.tolist()
-        x_rozmah = df[headers[0]].max() - math.fabs(df[headers[0]].min())
+        # x_rozmah = df[headers[0]].max() - math.fabs(df[headers[0]].min())
         y_rozmah = df[headers[1]].max() - math.fabs(df[headers[1]].min())
         
         return {
             'label': 'Розмах',
-            'value': {headers[0]:'-', headers[1]: round(y_rozmah, 3)} 
+            'value': {'x_quantile':'-', 'y_quantile': round(y_rozmah, 3)} 
         }
         
     @staticmethod
     def _get_dispersion(df: DataFrame) -> dict:
         dispersion = df.var()
         _dispersion = dispersion.to_dict()
-        k0 = list(_dispersion.keys())[0]
+        # k0 = list(_dispersion.keys())[0]
         k1 = list(_dispersion.keys())[1]
         return {
             'label': 'Дисперсія',
-            'value': {k0: '-',  k1: round(_dispersion[k1], 3)}
+            'value': {'x_dispersion': '-',  'y_dispersion': round(_dispersion[k1], 3)}
         }
         
     @staticmethod
     def _get_std(df: DataFrame) -> dict:
         std = df.std()
         _std = std.to_dict()
-        k0 = list(_std.keys())[0]
+        # k0 = list(_std.keys())[0]
         k1 = list(_std.keys())[1]
         return {
             'label': 'Середньоквадратичне відхилення',
-            'value': {k0: '-',  k1: round(_std[k1], 3)}
+            'value': {'x_std': '-',  'y_std': round(_std[k1], 3)}
         }
     
     @staticmethod
@@ -154,7 +161,7 @@ class AnalyticBaseForm(Form):
         
         return {
             'label': 'Математичне сподівання',
-            'value': {headers[0]:'-', headers[1]: round(val2, 3)}  
+            'value': {'x_mathematical_expectation':'-', 'y_mathematical_expectation': round(val2, 3)}  
         }
         
     @staticmethod
