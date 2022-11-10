@@ -88,8 +88,8 @@
 
 
                 $(`#period_descritiatcii`).text(data.graphs_data.period_descritiatcii.toFixed(5));
-                $(`#chastota_descritiatcii`).text(data.chastota_descritiatcii.toFixed(2));
-                $(`#kilkist_vidlikiv`).text(data.kilkist_vidlikiv.toFixed(2));
+                $(`#chastota_descritiatcii`).text(data.graphs_data.chastota_descritiatcii.toFixed(2));
+                $(`#kilkist_vidlikiv`).text(data.graphs_data.kilkist_vidlikiv.toFixed(2));
                 for (let [key, _value] of Object.entries(response.calculated_data.analytics_data)){
 
                     for(let [key2, _value2] of Object.entries(_value)){
