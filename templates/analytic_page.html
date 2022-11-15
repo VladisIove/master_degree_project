@@ -33,13 +33,30 @@
                         </thead>
                         <tbody>
                         {% for key, values in data.calculated_data.analytics_data.items %}
-                        <tr>
+                        <tr id="{{key}}">
                             <th scope="row">{{values.label}}</th>
                             {% for k, v in values.value.items %}
                                 <td class="text-center" id="{{k}}">{{v}}</td>
                             {% endfor %}
                         </tr>
                         {% endfor %}
+                        
+                        <tr id="dispersion" class="{% if 'dispersion' not in data.calculated_data.analytics_data %} d-none {% endif %}">
+                            <th scope="row">Дисперсія</th>
+                            <td class="text-center" id="x_dispersion">-</td>
+                            <td class="text-center" id="y_dispersion">-</td>
+                        </tr>
+                        <tr id="std" class="{% if 'std' not in data.calculated_data.analytics_data %} d-none {% endif %}">
+                            <th scope="row">Середньоквадратичне відхилення</th>
+                            <td class="text-center" id="x_std">-</td>
+                            <td class="text-center" id="y_std">-</td>
+                        </tr>
+                        <tr id="mathematical_expectation" class="{% if 'mathematical_expectation' not in data.calculated_data.analytics_data %} d-none {% endif %}">
+                            <th scope="row">Математичне сподівання</th>
+                            <td class="text-center" id="x_mathematical_expectation">-</td>
+                            <td class="text-center" id="y_mathematical_expectation">-</td>
+                        </tr>
+                         
                         <tr>
                             <th scope="row">Період дискретизація</th>
                             <td colspan="2" id="period_descritiatcii"> {{ data.calculated_data.graphs_data.period_descritiatcii|floatformat:5 }} (с) </td>

@@ -5,8 +5,8 @@ from pandas import DataFrame
 from utils.base_forms import AnalyticBaseForm 
 
 from utils.parser_files import convertor_file_to_df
-from django.forms import FileField, FloatField, IntegerField, ChoiceField, BooleanField
-
+from django.forms import FileField, FloatField, IntegerField, ChoiceField, BooleanField, MultipleChoiceField
+from acoustics.generator import noise as noise_generator
 from utils.base_validators import validate_file_extension
 
 class TimeAnalyticForm(AnalyticBaseForm):
@@ -57,8 +57,24 @@ class CustomAnalyitcForm(AnalyticBaseForm):
         (SignalType.COS, 'cos'),
         (SignalType.SIN, 'sin')
     ) 
+
+    class Noises:
+        WHITE = 'white'
+        PINK = 'pink'
+        BLUE = 'blue'
+        BROWN = 'brown'
+        VIOLET = 'violet'
     
+    NOISES = (
+        (Noises.WHITE, 'Білий шум'),
+        (Noises.PINK, 'Рожевий шум'),
+        (Noises.BLUE, 'Синій шум'),
+        (Noises.BROWN, 'Коричневий шум'),
+        (Noises.VIOLET, 'Фіолетовий шум'),
+    )
     
+
+    noises = MultipleChoiceField(label='Шуми', choices=NOISES, required=False)
     type_of_signal = ChoiceField(required=False, choices=SIGNAL_TYPE)
     mean = FloatField(label='Середне значення', required=True)
     scope = FloatField(label='Розмах', required=True)
@@ -70,7 +86,7 @@ class CustomAnalyitcForm(AnalyticBaseForm):
     frequency = IntegerField(label='Частота', required=True)
     
     def calculation_data(self, df: DataFrame) -> dict:
-        analytics_data = self._determination_data(df)
+        analytics_data =  self._stochastic_data(df) if self.cleaned_data.get('noises') else  self._determination_data(df)
         graphs_data = self._get_graphs_data(df.copy())
         return {
             'analytics_data': analytics_data,
@@ -89,6 +105,7 @@ class CustomAnalyitcForm(AnalyticBaseForm):
         p = self.cleaned_data['count_of_periods']
         count_of_dots = self.cleaned_data['count_of_dots']
         checker_count_of_dot_or_period_sampling = self.cleaned_data['checker_count_of_dot_or_period_sampling']
+        noises = self.cleaned_data['noises']
         
         if checker_count_of_dot_or_period_sampling:
             t = crange(Td,p*T,Td)
@@ -97,6 +114,10 @@ class CustomAnalyitcForm(AnalyticBaseForm):
         z = 2*np.pi*t*f
         zz = rozmah/2*getattr(np, type_of_signal)(z)
         y = float(mean)+ zz
+        if noises:
+            self.cleaned_data['signal_type'] = TimeAnalyticForm.SignalType.STOCHASTIC
+        for noise in noises:
+            y += noise_generator(len(y), noise)
         
         return DataFrame({'t': t.tolist(), 'y': y.tolist()})
     

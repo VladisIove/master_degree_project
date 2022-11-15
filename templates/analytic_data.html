@@ -82,16 +82,13 @@
               success: function (response) {
                 data_for_graph = response.data_for_graph;
                 data = response.calculated_data;
-                set_variables(data, data_for_graph);
                 console.log(response)
-                
-
-
+                set_variables(data, data_for_graph);
                 $(`#period_descritiatcii`).text(data.graphs_data.period_descritiatcii.toFixed(5));
                 $(`#chastota_descritiatcii`).text(data.graphs_data.chastota_descritiatcii.toFixed(2));
                 $(`#kilkist_vidlikiv`).text(data.graphs_data.kilkist_vidlikiv.toFixed(2));
-                for (let [key, _value] of Object.entries(response.calculated_data.analytics_data)){
 
+                for (let [key, _value] of Object.entries(response.calculated_data.analytics_data)){
                     for(let [key2, _value2] of Object.entries(_value)){
                       if( key2 === 'value'){
                         for(let [key3, _value3] of Object.entries(_value2)){
@@ -101,6 +98,17 @@
                     }
                     }
                 }
+                let ad_keys = Object.keys(response.calculated_data.analytics_data);
+                for (let stochastic_value of ["mathematical_expectation", "std", "dispersion"]){
+                  console.log(ad_keys, stochastic_value)
+                  if (ad_keys.includes(stochastic_value))
+                    $(`#${stochastic_value}`).removeClass('d-none');
+                  else 
+                    $(`#${stochastic_value}`).addClass('d-none');
+                }
+                
+                
+                
               }
             })
     })
@@ -109,6 +117,7 @@
   data = JSON.parse(`{{data.calculated_data|safe}}`.replace(/'/g, '"'));
 
   window.set_variables = (data, data_for_graph) => {
+    console.log(data)
     window.data_for_fft_graph = data['graphs_data']['fft']
     window.data_for_periodogram_graph = data['graphs_data']['periodogram'];
     window.data_for_triangle_periodogram_graph = data['graphs_data']['triangle_periodogram'];

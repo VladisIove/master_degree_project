@@ -1,6 +1,5 @@
-from functools import cached_property
 import math
-from utils.custom_range import crange
+from typing import List, Union
 import numpy as np
 
 from pandas import DataFrame
@@ -33,23 +32,22 @@ class AnalyticBaseForm(Form):
             'chastota_descritiatcii': chastota_descritiatcii,
             
             'fft': fft_data,
-            'periodogram': self._get_periodogram_data(df),
-            'triangle_periodogram': self._get_triangle_periodogram_data(df),
-            'hann_periodogram': self._get_hann_periodogram_data(df),
-            
-            'blackman_periodogram': self._get_blackman_periodogram_data(df),
-            'hamming_periodogram': self._get_hamming_periodogram_data(df),
-            'bartlett_periodogram': self._get_bartlett_periodogram_data(df),
-            'flattop_periodogram': self._get_flattop_periodogram_data(df),
-            'parzen_periodogram': self._get_parzen_periodogram_data(df),
-            'bohman_periodogram': self._get_bohman_periodogram_data(df),
-            'blackmanharris_periodogram': self._get_blackmanharris_periodogram_data(df),
-            'nuttall_periodogram': self._get_nuttall_periodogram_data(df),
-            'barthann_periodogram': self._get_barthann_periodogram_data(df),
-            'cosine_periodogram': self._get_cosine_periodogram_data(df),
-            'exponential_periodogram': self._get_exponential_periodogram_data(df),
-            'tukey_periodogram': self._get_tukey_periodogram_data(df),
-            'taylor_periodogram': self._get_taylor_periodogram_data(df),
+            'periodogram': self._get_periodogram_data_by_widnow(df, periodograms_without_signal['periodogram']),
+            'triangle_periodogram': self._get_periodogram_data_by_widnow(df, periodograms_without_signal['triangle_periodogram']),
+            'hann_periodogram': self._get_periodogram_data_by_widnow(df, periodograms_without_signal['hann_periodogram']),
+            'blackman_periodogram':  self._get_periodogram_data_by_widnow(df, periodograms_without_signal['blackman_periodogram']),
+            'hamming_periodogram':  self._get_periodogram_data_by_widnow(df, periodograms_without_signal['hamming_periodogram']),
+            'bartlett_periodogram':  self._get_periodogram_data_by_widnow(df, periodograms_without_signal['bartlett_periodogram']),
+            'flattop_periodogram':  self._get_periodogram_data_by_widnow(df, periodograms_without_signal['flattop_periodogram']),
+            'parzen_periodogram': self._get_periodogram_data_by_widnow(df, periodograms_without_signal['parzen_periodogram']),
+            'bohman_periodogram':  self._get_periodogram_data_by_widnow(df, periodograms_without_signal['bohman_periodogram']),
+            'blackmanharris_periodogram':  self._get_periodogram_data_by_widnow(df, periodograms_without_signal['blackmanharris_periodogram']),
+            'nuttall_periodogram':  self._get_periodogram_data_by_widnow(df, periodograms_without_signal['nuttall_periodogram']),
+            'barthann_periodogram':  self._get_periodogram_data_by_widnow(df, periodograms_without_signal['barthann_periodogram']),
+            'cosine_periodogram':  self._get_periodogram_data_by_widnow(df, periodograms_without_signal['cosine_periodogram']),
+            'exponential_periodogram':  self._get_periodogram_data_by_widnow(df, periodograms_without_signal['exponential_periodogram']),
+            'tukey_periodogram':  self._get_periodogram_data_by_widnow(df, periodograms_without_signal['tukey_periodogram']),
+            'taylor_periodogram':  self._get_periodogram_data_by_widnow(df, periodograms_without_signal['taylor_periodogram']),
             
             'periodograms_without_signal': periodograms_without_signal,
             'periodograms_without_signal_frequency': periodograms_without_signal_frequency,
@@ -202,7 +200,7 @@ class AnalyticBaseForm(Form):
         
         return DataFrame({'y': list(yf), 'x': list(xf.round(0))}).to_dict('list')
     
-    def _get_periodogram_data_by_widnow(self, df: DataFrame, window: str) -> dict: 
+    def _get_periodogram_data_by_widnow(self, df: DataFrame, window: Union[str, List[float]]) -> dict: 
         Y_header_name = df.columns.tolist()[1]
         y = df[Y_header_name].to_list()
         fd = self._get_chastota_descritiatcii(df)
