@@ -72,7 +72,6 @@ class CustomAnalyitcForm(AnalyticBaseForm):
         (Noises.BROWN, 'Коричневий шум'),
         (Noises.VIOLET, 'Фіолетовий шум'),
     )
-    
 
     noises = MultipleChoiceField(label='Шуми', choices=NOISES, required=False)
     type_of_signal = ChoiceField(required=False, choices=SIGNAL_TYPE)
