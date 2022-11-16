@@ -12,8 +12,10 @@
   </ul>
   <div class="border tab-content" id="myTabContent">
     <div class="tab-pane {% if data.calculated_data == None %} fade {% else %} active {% endif %} p-5" id="graph_time" role="tabpanel" aria-labelledby="graph_time-tab">
-
-      <div id="graph-plt" class="col-12 m-0 p-0"></div>
+      
+      <div id="main-graph" class="row p-0 m-0">
+        <div id="graph-plt" class="col-12 m-0 p-0"></div>
+      </div>
 
       <div class="row">
 
@@ -82,7 +84,79 @@
               success: function (response) {
                 data_for_graph = response.data_for_graph;
                 data = response.calculated_data;
-                console.log(response)
+
+                if(Object.keys(response.calculated_data).includes('noise_data')){
+                  $('#graph-plt').removeClass('col-12');
+                  $('#graph-plt').addClass('col-9');
+                  $( "#noise_data" ).remove();
+                  $('#main-graph').prepend(`
+                  <div class="col-3 m-0 p-0" id="noise_data"> 
+                    <div style="height:250px;width:400px;"  id="noise-graph-plt" class="col-12 m-0 p-0">
+                    </div> 
+                    <table class="table table-bordered  col-12 my-2" style="font-size: 12px">
+                      <thead>
+                      <tr>
+              
+                          <th scope="col">#</th>
+                          <th>Амплітуда(Гц)</th>
+                      </tr>
+                      </thead>
+                      <tbody>
+                        <tr id="noise_snr">
+                          <th scope="row">SNR</th>
+                          <td class="text-center">${response.calculated_data.noise_data.calculation_data.snr}</td>
+                      </tr>
+                        <tr id="noise_max">
+                            <th scope="row">Мінімальне значення</th>
+                            <td class="text-center">${response.calculated_data.noise_data.calculation_data.min}</td>
+                        </tr>
+                        <tr id="noise_min">
+                              <th scope="row">Максимальне значення</th>
+                            <td class="text-center">${response.calculated_data.noise_data.calculation_data.max}</td>
+                        </tr>
+                        <tr id="noise_mean">
+                              <th scope="row">Дисперсія</th>
+                            <td class="text-center">${response.calculated_data.noise_data.calculation_data.mean}</td>
+                        </tr>
+                        <tr id="noise_dispersion">
+                              <th scope="row">Дисперсія</th>
+                            <td class="text-center">${response.calculated_data.noise_data.calculation_data.dispersion}</td>
+                        </tr>
+                        <tr id="noise_std" >
+                            <th scope="row">Середньоквадратичне відхилення</th>
+                            <td class="text-center" >${response.calculated_data.noise_data.calculation_data.std}</td>
+                        </tr>
+                  </div>`)
+
+                  let noise_trace1 = {
+                    x: response.calculated_data.noise_data.plot_data['x'],
+                    y: response.calculated_data.noise_data.plot_data['y'],
+                    type: 'scattergl',
+                    mode: 'lines+markers',
+                    name: 'Шум',
+                  };
+                  let noise_data_for_graph = [noise_trace1];
+                  let noise_layout = {
+                    title: 'Шумова складова',
+                    xaxis: {
+                      title: `${keys[0]} (с)`,
+                      showgrid: true,
+                      zeroline: true
+                    },
+                    yaxis: {
+                      title: `${keys[1]} (Гц)`,
+                      showgrid: true,
+                      zeroline: true
+                    },
+                    showlegend: false,
+                  };
+                  Plotly.newPlot('noise-graph-plt', noise_data_for_graph, noise_layout);
+
+              }else{
+                  $('#graph-plt').addClass('col-12');
+                  $('#graph-plt').removeClass('col-9');
+                  $( "#noise_data" ).remove();
+              } 
                 set_variables(data, data_for_graph);
                 $(`#period_descritiatcii`).text(data.graphs_data.period_descritiatcii.toFixed(5));
                 $(`#chastota_descritiatcii`).text(data.graphs_data.chastota_descritiatcii.toFixed(2));
@@ -100,14 +174,13 @@
                 }
                 let ad_keys = Object.keys(response.calculated_data.analytics_data);
                 for (let stochastic_value of ["mathematical_expectation", "std", "dispersion"]){
-                  console.log(ad_keys, stochastic_value)
                   if (ad_keys.includes(stochastic_value))
                     $(`#${stochastic_value}`).removeClass('d-none');
                   else 
                     $(`#${stochastic_value}`).addClass('d-none');
                 }
-                
-                
+                console.log(response.calculated_data)
+       
                 
               }
             })

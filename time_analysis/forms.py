@@ -1,4 +1,5 @@
 
+from traitlets import default
 from utils.custom_range import crange
 import numpy as np
 from pandas import DataFrame
@@ -74,6 +75,7 @@ class CustomAnalyitcForm(AnalyticBaseForm):
     )
 
     noises = MultipleChoiceField(label='Шуми', choices=NOISES, required=False)
+    snr = FloatField(label='SNR', min_value=0.00001, required=False)
     type_of_signal = ChoiceField(required=False, choices=SIGNAL_TYPE)
     mean = FloatField(label='Середне значення', required=True)
     scope = FloatField(label='Розмах', required=True)
@@ -87,9 +89,35 @@ class CustomAnalyitcForm(AnalyticBaseForm):
     def calculation_data(self, df: DataFrame) -> dict:
         analytics_data =  self._stochastic_data(df) if self.cleaned_data.get('noises') else  self._determination_data(df)
         graphs_data = self._get_graphs_data(df.copy())
-        return {
+        
+        return_data = {
             'analytics_data': analytics_data,
-            'graphs_data': graphs_data
+            'graphs_data': graphs_data,
+        }
+        if self.cleaned_data.get('noise_data'):
+            return_data['noise_data'] = self._get_noise_data()
+        return return_data
+    
+    def _get_noise_data(self) -> dict:
+        noise_data = self.cleaned_data['noise_data']
+        calculation_data = self._get_calculation_data(noise_data['y'])
+        return {
+            'calculation_data': calculation_data,
+            'plot_data': {
+                'y': list(noise_data['y']),
+                'x': list(noise_data['x'])
+            }
+        }
+        
+    def _get_calculation_data(self, noise_data) -> dict:
+        
+        return {
+            'snr': round(self.cleaned_data['snr'], 3),
+            'min': round(np.min(noise_data), 3),
+            'max': round(np.max(noise_data), 3),
+            'mean': round(np.mean(noise_data), 3),
+            'std': round(np.std(noise_data), 3),
+            'dispersion': round(np.var(noise_data) , 3),
         }
         
     def get_dataframe(self) -> DataFrame:
@@ -114,9 +142,21 @@ class CustomAnalyitcForm(AnalyticBaseForm):
         zz = rozmah/2*getattr(np, type_of_signal)(z)
         y = float(mean)+ zz
         if noises:
+            snr = self.cleaned_data['snr']
+            
+            noise_data = np.zeros(len(y))
+            for noise in noises:
+                noise_data += noise_generator(len(y), noise)
+            
+            koef = np.sqrt( np.mean( np.power(y,2) ) / ( np.power(10,(snr/10)) * np.mean(np.power(noise_data,2)) ) )
+            noise_data = noise_data * koef
+            self.cleaned_data['noise_data'] = {
+                'y': noise_data,
+                'x': t 
+            }
             self.cleaned_data['signal_type'] = TimeAnalyticForm.SignalType.STOCHASTIC
-        for noise in noises:
-            y += noise_generator(len(y), noise)
+            
+            y += noise_data 
         
         return DataFrame({'t': t.tolist(), 'y': y.tolist()})
     

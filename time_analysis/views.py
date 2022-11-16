@@ -57,6 +57,7 @@ class CustomAnalyticView(ExportFileViewMixin, FormView):
                     type_of_signal = self.form_class.SignalType.SIN,
                     mean = 3,
                     scope = 4,
+                    snr=1,
                     count_of_periods = 2,
                     frequency_sampling = 500,
                     period_sampling = 0.002,
