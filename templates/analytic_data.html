@@ -98,33 +98,33 @@
                       <tr>
               
                           <th scope="col">#</th>
-                          <th>Амплітуда(Гц)</th>
+                          <th class="px-0">Амплітуда(Гц)</th>
                       </tr>
                       </thead>
                       <tbody>
                         <tr id="noise_snr">
                           <th scope="row">SNR</th>
-                          <td class="text-center">${response.calculated_data.noise_data.calculation_data.snr}</td>
+                          <td class="text-center px-0">${response.calculated_data.noise_data.calculation_data.snr}</td>
                       </tr>
                         <tr id="noise_max">
                             <th scope="row">Мінімальне значення</th>
-                            <td class="text-center">${response.calculated_data.noise_data.calculation_data.min}</td>
+                            <td class="text-center px-0">${response.calculated_data.noise_data.calculation_data.min}</td>
                         </tr>
                         <tr id="noise_min">
                               <th scope="row">Максимальне значення</th>
-                            <td class="text-center">${response.calculated_data.noise_data.calculation_data.max}</td>
+                            <td class="text-center px-0">${response.calculated_data.noise_data.calculation_data.max}</td>
                         </tr>
                         <tr id="noise_mean">
                               <th scope="row">Дисперсія</th>
-                            <td class="text-center">${response.calculated_data.noise_data.calculation_data.mean}</td>
+                            <td class="text-center px-0">${response.calculated_data.noise_data.calculation_data.mean}</td>
                         </tr>
                         <tr id="noise_dispersion">
                               <th scope="row">Дисперсія</th>
-                            <td class="text-center">${response.calculated_data.noise_data.calculation_data.dispersion}</td>
+                            <td class="text-center px-0">${response.calculated_data.noise_data.calculation_data.dispersion}</td>
                         </tr>
                         <tr id="noise_std" >
                             <th scope="row">Середньоквадратичне відхилення</th>
-                            <td class="text-center" >${response.calculated_data.noise_data.calculation_data.std}</td>
+                            <td class="text-center px-0" >${response.calculated_data.noise_data.calculation_data.std}</td>
                         </tr>
                   </div>`)
 
@@ -188,9 +188,9 @@
   {% endif %}
   data_for_graph = JSON.parse(`{{data.data_for_graph|safe}}`.replace(/'/g, '"'));
   data = JSON.parse(`{{data.calculated_data|safe}}`.replace(/'/g, '"'));
+  var headers = JSON.parse(`{{data.headers|safe}}`.replace(/'/g, '"'));
 
   window.set_variables = (data, data_for_graph) => {
-    console.log(data)
     window.data_for_fft_graph = data['graphs_data']['fft']
     window.data_for_periodogram_graph = data['graphs_data']['periodogram'];
     window.data_for_triangle_periodogram_graph = data['graphs_data']['triangle_periodogram'];
@@ -259,12 +259,12 @@
     window.layout = {
       title: 'Графік вхідного сигналу у часовому просторі',
       xaxis: {
-        title: `${keys[0]} (с)`,
+        title: `${headers[0]} (с)`,
         showgrid: true,
         zeroline: true
       },
       yaxis: {
-        title: `${keys[1]} (Гц)`,
+        title: `${headers[1]} (Гц)`,
         showgrid: true,
         zeroline: true
       },
