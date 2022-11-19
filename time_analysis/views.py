@@ -1,7 +1,5 @@
-from functools import wraps
+
 import json
-import sys
-from time import time
 from typing import Any, Dict
 
 from django.http import JsonResponse
@@ -12,7 +10,6 @@ from pandas import DataFrame
 
 from time_analysis.forms import CustomAnalyitcForm, TimeAnalyticForm
 
-# Create your views here.
 
 class TimeAnalysisView(ExportFileViewMixin, FormView):
     template_name = "time_analysis.html"
@@ -20,8 +17,6 @@ class TimeAnalysisView(ExportFileViewMixin, FormView):
     
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         context_data = super().get_context_data(**kwargs)
-        # with open('result.json', 'w') as f:
-        #     json.dump(kwargs['data'], f)
         if kwargs:
             context_data['export_file_form'] = DownloadAnalyticFilesForm(data={'context_data_field': kwargs.get('data', {}).get('calculated_data_json'), 'file_type': DownloadAnalyticFilesForm.FileType.TXT})
         else: 
